@@ -19,7 +19,11 @@ projectile-bookmarks.eld
 session*
 .cask
 tramp
-/var/pcache
+/var
+/transient
+/tramp
+/.cache
+/.persistent
 .emacs.desktop
 .emacs.desktop.lock
 network-security.data
@@ -31,3 +35,6 @@ var/
 .cache/
 .lsp-session*
 gotools/
+
+/eln-cache/
+/speed-type/
