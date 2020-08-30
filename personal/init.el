@@ -16,6 +16,7 @@
     flycheck
     flycheck-pos-tip
     flycheck-joker
+    flycheck-clj-kondo
     clj-refactor
     clojure-mode-extra-font-locking
     markdown-mode
@@ -117,17 +118,27 @@
 ;; add short cut for cider-repl-clear-buffer
 (define-key cider-repl-mode-map (kbd "C-c SPC") 'cider-repl-clear-buffer)
 
+;; setup flycheck linters
 (require 'flycheck)
 (require 'flycheck-pos-tip)
 (require 'flycheck-joker)
+(require 'flycheck-clj-kondo)
+
+(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
+  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
+
+(dolist (checkers '((clj-kondo-clj . clojure-joker)
+                    (clj-kondo-cljs . clojurescript-joker)
+                    (clj-kondo-cljc . clojure-joker)
+                    (clj-kondo-edn . edn-joker)))
+  (flycheck-add-next-checker (car checkers) (cons 'error (cdr checkers))))
+
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode)
 
-;; flycheck-pos-tip
 (eval-after-load 'flycheck
   '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
-;; cider mode use flycheck
 (add-hook 'cider-mode-hook
           (lambda ()
             (setq next-error-function #'flycheck-next-error-function)))
