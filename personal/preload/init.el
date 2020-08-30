@@ -8,4 +8,4 @@
 (prefer-coding-system 'utf-8)
 
 ;; disable prelude-theme
-;; (setq prelude-theme nil)
+(setq prelude-theme nil)

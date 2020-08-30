@@ -10,7 +10,10 @@
 
 ;; install my packages
 (defvar my-packages
-  '(paredit
+  '(org
+    org-bullets
+
+    paredit
     edn ;; needed for other clojure package
     cider
     flycheck
@@ -19,12 +22,21 @@
     flycheck-clj-kondo
     clj-refactor
     clojure-mode-extra-font-locking
+
+    magit-gitflow
     markdown-mode
+    darkokai-theme
     highlight-symbol
+    all-the-icons
+
     treemacs
     treemacs-projectile
+    treemacs-icons-dired
+    treemacs-magit
+
     persistent-scratch
-    doom-modeline))
+    doom-modeline
+    counsel))
 
 (dolist (p my-packages)
   (when (not (package-installed-p p))
@@ -53,6 +65,61 @@
 (when (fboundp 'horizontal-scroll-bar-mode)
   (horizontal-scroll-bar-mode -1))
 
+;;;;;;;;; darkokai theme ;;;;;;;;;;;;;
+
+(require 'darkokai-theme)
+(setq darkokai-mode-line-padding 1)
+(load-theme 'darkokai t)
+
+(defface org-block-begin-line
+  '((t (:foreground "#008ED1" :background "#333")))
+  "Face used for the line delimiting the begin of source blocks.")
+
+(defface org-block
+  '((t (:foreground "#FFFFEA" :background "#000")))
+  "Face used for the source block background.")
+
+(defface org-block-end-line
+  '((t (:foreground "#008ED1" :background "#333")))
+  "Face used for the line delimiting the end of source blocks.")
+
+(custom-theme-set-faces
+ 'darkokai
+ '(org-block-begin-line
+   ((t (:foreground "#008ED1" :background "#333"))))
+ '(org-block
+   ((t (:foreground "#FFFFEA" :background "#000"))))
+ '(org-block-end-line
+   ((t (:foreground "#008ED1" :background "#333")))))
+
+;; increase font size for better readability
+(set-frame-font "InputMonoLight-11")
+(add-to-list 'default-frame-alist '(font . "InputMonoLight-11"))
+
+;; fix full-size issue on Xming
+(setq frame-resize-pixelwise t)
+
+(if (display-graphic-p)
+    (progn
+      (setq initial-frame-alist
+            '(
+              (tool-bar-lines . 0)
+              (width . 80) ; chars
+              (height . 30) ; lines
+              ;; (background-color . "honeydew")
+              (left . 50)
+              (top . 50)))
+      (setq default-frame-alist
+            '(
+              (tool-bar-lines . 0)
+              (width . 80)
+              (height . 30)
+              ;; (background-color . "honeydew")
+              (left . 50)
+              (top . 50))))
+  (progn
+    (setq initial-frame-alist '( (tool-bar-lines . 0)))
+    (setq default-frame-alist '( (tool-bar-lines . 0)))))
 
 ;;;;;;;;;; global key binding ;;;;;;;;;;
 
@@ -80,10 +147,17 @@
 (global-set-key (kbd "C-;") 'toggle-comment-on-line)
 (define-key flyspell-mode-map (kbd "C-;") nil)
 
+;; enable git flow
+(require 'magit-gitflow)
+(add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
+
 ;; Syntax highlighting
 (require 'highlight-symbol)
 (global-set-key (kbd "C-.") 'highlight-symbol-at-point)
 (define-key flyspell-mode-map (kbd "C-.") nil)
+
+;; load icons
+(require 'all-the-icons)
 
 (require 'smartparens)
 (smartparens-global-mode)
@@ -152,6 +226,43 @@
 ;; cider mode enable history file
 (setq cider-repl-history-file "~/.cider-repl-history")
 
+;; org mode config
+(require 'org)
+(require 'org-bullets)
+(require 'cider)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (clojure . t)
+   (shell . t)))
+;; specify clojure backend to use in org-mode
+(setq org-babel-clojure-backend 'cider)
+(setq org-babel-clojure-sync-nrepl-timeout nil)
+;; useful keybindings when using clojure in org-mode
+(org-defkey org-mode-map "\C-x\C-e" 'cider-eval-last-sexp)
+(org-defkey org-mode-map "\C-x\C-d" 'cider-doc)
+;; turn on visual-line-mode for org-mode
+(add-hook 'org-mode-hook
+          (lambda ()
+            (linum-mode -1)
+            (display-line-numbers-mode -1)
+            (whitespace-mode -1)
+            (turn-on-visual-line-mode)))
+(setq org-hide-emphasis-markers t)
+(setq org-src-tab-acts-natively t)
+(setq org-confirm-babel-evaluate nil)
+(setq org-edit-src-content-indentation 0)
+(setq org-src-fontify-natively t)
+(setq org-src-preserve-indentation nil)
+(setq org-pretty-entities t)
+(set-face-attribute 'org-meta-line nil
+                    :height 0.8
+                    :slant 'normal
+                    ;; :foreground "black"
+                    :weight 'light)
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TRAMP
 (customize-set-variable
@@ -161,11 +272,13 @@
   "-o ControlMaster=auto "
   "-o ControlPersist=yes"))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Tramp speed up by disabling some
-
 (require 'editorconfig)
 (editorconfig-mode -1)
+
+;; counsel
+(require 'counsel)
+(global-set-key (kbd "C-x 8 RET") 'counsel-unicode-char)
 
 (defadvice projectile-project-root (around ignore-remote first activate)
   (unless (file-remote-p default-directory) ad-do-it))
@@ -277,20 +390,24 @@
   (define-key treemacs-mode-map [mouse-1] 'treemacs-single-click-expand-action))
 
 (require 'treemacs-projectile)
+(require 'treemacs-icons-dired)
+(require 'treemacs-magit)
+
+(treemacs-icons-dired-mode)
 
 ;; enable doom-modeline
 (require 'doom-modeline)
 (doom-modeline-mode 1)
 
-;; adjust zenburn theme
-(zenburn-with-color-variables
-  (custom-theme-set-faces
-   'zenburn
-   `(hl-line-face ((t (:background ,zenburn-bg+1))))
-   `(hl-line ((t (:background ,zenburn-bg+1))))
-   `(mode-line-inactive
-     ((t (:foreground ,zenburn-green-1
-                      :background ,zenburn-bg-08
-                      :box (:line-width -1 :style released-button)))))))
+;;;; adjust zenburn theme
+;;(zenburn-with-color-variables
+;;  (custom-theme-set-faces
+;;   'zenburn
+;;   `(hl-line-face ((t (:background ,zenburn-bg+1))))
+;;   `(hl-line ((t (:background ,zenburn-bg+1))))
+;;   `(mode-line-inactive
+;;     ((t (:foreground ,zenburn-green-1
+;;                      :background ,zenburn-bg-08
+;;                      :box (:line-width -1 :style released-button)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
