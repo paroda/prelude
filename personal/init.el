@@ -93,8 +93,8 @@
    ((t (:foreground "#008ED1" :background "#333")))))
 
 ;; increase font size for better readability
-(set-frame-font "InputMonoLight-11")
-(add-to-list 'default-frame-alist '(font . "InputMonoLight-11"))
+(set-frame-font "InputMono-12")
+(add-to-list 'default-frame-alist '(font . "InputMono-12"))
 
 ;; fix full-size issue on Xming
 (setq frame-resize-pixelwise t)
