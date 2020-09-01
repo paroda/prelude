@@ -58,13 +58,6 @@
     (global-display-line-numbers-mode)
   (global-linum-mode))
 
-;; Don't show native OS scroll bars for buffers because they're redundant
-(when (fboundp 'scroll-bar-mode)
-  (scroll-bar-mode -1))
-
-(when (fboundp 'horizontal-scroll-bar-mode)
-  (horizontal-scroll-bar-mode -1))
-
 ;;;;;;;;; darkokai theme ;;;;;;;;;;;;;
 
 (require 'darkokai-theme)
@@ -92,35 +85,6 @@
  '(org-block-end-line
    ((t (:foreground "#008ED1" :background "#333")))))
 
-;; increase font size for better readability
-(set-frame-font "InputMono-12")
-(add-to-list 'default-frame-alist '(font . "InputMono-12"))
-
-;; fix full-size issue on Xming
-(setq frame-resize-pixelwise t)
-
-(if (display-graphic-p)
-    (progn
-      (setq initial-frame-alist
-            '(
-              (tool-bar-lines . 0)
-              (width . 80) ; chars
-              (height . 30) ; lines
-              ;; (background-color . "honeydew")
-              (left . 50)
-              (top . 50)))
-      (setq default-frame-alist
-            '(
-              (tool-bar-lines . 0)
-              (width . 80)
-              (height . 30)
-              ;; (background-color . "honeydew")
-              (left . 50)
-              (top . 50))))
-  (progn
-    (setq initial-frame-alist '( (tool-bar-lines . 0)))
-    (setq default-frame-alist '( (tool-bar-lines . 0)))))
-
 ;;;;;;;;;; global key binding ;;;;;;;;;;
 
 ;; hot key for switching window
@@ -136,16 +100,18 @@
 (global-set-key (kbd "C-M-s") 'isearch-forward)
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 
-;; ;; shows a list of buffers
+;; shows a list of buffers
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
-;; comments
+;; configure comment tool
 (defun toggle-comment-on-line ()
   "Comment or uncomment current line."
   (interactive)
   (comment-or-uncomment-region (line-beginning-position) (line-end-position)))
 (global-set-key (kbd "C-;") 'toggle-comment-on-line)
 (define-key flyspell-mode-map (kbd "C-;") nil)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; enable git flow
 (require 'magit-gitflow)
@@ -155,9 +121,6 @@
 (require 'highlight-symbol)
 (global-set-key (kbd "C-.") 'highlight-symbol-at-point)
 (define-key flyspell-mode-map (kbd "C-.") nil)
-
-;; load icons
-(require 'all-the-icons)
 
 (require 'smartparens)
 (smartparens-global-mode)
@@ -328,9 +291,18 @@
 (persistent-scratch-setup-default)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; enable doom-modeline
+
+(require 'doom-modeline)
+(doom-modeline-mode 1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; treemacs setup
 
 (require 'treemacs)
+(require 'treemacs-projectile)
+(require 'treemacs-magit)
+
 (progn
   (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
         treemacs-deferred-git-apply-delay      0.5
@@ -389,25 +361,22 @@
 
   (define-key treemacs-mode-map [mouse-1] 'treemacs-single-click-expand-action))
 
-(require 'treemacs-projectile)
-(require 'treemacs-icons-dired)
-(require 'treemacs-magit)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; GUI Only!!
 
-(treemacs-icons-dired-mode)
+(when (display-graphic-p)
 
-;; enable doom-modeline
-(require 'doom-modeline)
-(doom-modeline-mode 1)
+  (require 'all-the-icons) ;; load icons
+  (require 'treemacs-icons-dired)
+  (treemacs-icons-dired-mode)
 
-;;;; adjust zenburn theme
-;;(zenburn-with-color-variables
-;;  (custom-theme-set-faces
-;;   'zenburn
-;;   `(hl-line-face ((t (:background ,zenburn-bg+1))))
-;;   `(hl-line ((t (:background ,zenburn-bg+1))))
-;;   `(mode-line-inactive
-;;     ((t (:foreground ,zenburn-green-1
-;;                      :background ,zenburn-bg-08
-;;                      :box (:line-width -1 :style released-button)))))))
+  (setq frame-resize-pixelwise t) ;; fix full-size issue on Xming
+  (setq default-frame-alist  '((left . 50)
+                               (top . 50)
+                               (width . 90)  ; chars
+                               (height . 30) ; lines
+                               (vertical-scroll-bars . nil)
+                               (horizontal-scroll-bars . nil)
+                               (font . "InputMono-11"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
