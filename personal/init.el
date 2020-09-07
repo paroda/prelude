@@ -64,26 +64,26 @@
 (setq darkokai-mode-line-padding 1)
 (load-theme 'darkokai t)
 
-(defface org-block-begin-line
-  '((t (:foreground "#008ED1" :background "#333")))
-  "Face used for the line delimiting the begin of source blocks.")
-
-(defface org-block
-  '((t (:foreground "#FFFFEA" :background "#000")))
-  "Face used for the source block background.")
-
-(defface org-block-end-line
-  '((t (:foreground "#008ED1" :background "#333")))
-  "Face used for the line delimiting the end of source blocks.")
+;; (defface org-block-begin-line
+;;   '((t (:foreground "#008ED1" :background "#333")))
+;;   "Face used for the line delimiting the begin of source blocks.")
+;;
+;; (defface org-block
+;;   '((t (:foreground "#FFFFEA" :background "#000")))
+;;   "Face used for the source block background.")
+;;
+;; (defface org-block-end-line
+;;   '((t (:foreground "#008ED1" :background "#333")))
+;;   "Face used for the line delimiting the end of source blocks.")
 
 (custom-theme-set-faces
  'darkokai
- '(org-block-begin-line
-   ((t (:foreground "#008ED1" :background "#333"))))
- '(org-block
-   ((t (:foreground "#FFFFEA" :background "#000"))))
- '(org-block-end-line
-   ((t (:foreground "#008ED1" :background "#333")))))
+ '(org-block-begin-line ;; the line delimiting the begin of source blocks
+   ((t (:foreground "#008ED1" :background "#333" :extend t))))
+ '(org-block ;; the source block background
+   ((t (:foreground "#FFFFEA" :background "#000" :extend t))))
+ '(org-block-end-line ;; the line delimiting the end of source blocks.
+   ((t (:foreground "#008ED1" :background "#333" :extend t)))))
 
 ;;;;;;;;;; global key binding ;;;;;;;;;;
 
