@@ -13,6 +13,9 @@
   '(org
     org-bullets
 
+    graphviz-dot-mode
+    plantuml-mode
+
     paredit
     edn ;; needed for other clojure package
     cider
@@ -64,26 +67,22 @@
 (setq darkokai-mode-line-padding 1)
 (load-theme 'darkokai t)
 
-;; (defface org-block-begin-line
-;;   '((t (:foreground "#008ED1" :background "#333")))
-;;   "Face used for the line delimiting the begin of source blocks.")
-;;
-;; (defface org-block
-;;   '((t (:foreground "#FFFFEA" :background "#000")))
-;;   "Face used for the source block background.")
-;;
-;; (defface org-block-end-line
-;;   '((t (:foreground "#008ED1" :background "#333")))
-;;   "Face used for the line delimiting the end of source blocks.")
-
 (custom-theme-set-faces
  'darkokai
  '(org-block-begin-line ;; the line delimiting the begin of source blocks
-   ((t (:foreground "#008ED1" :background "#333" :extend t))))
+   ((t (:foreground "#666" :background "#333" :extend t))))
  '(org-block ;; the source block background
    ((t (:foreground "#FFFFEA" :background "#000" :extend t))))
  '(org-block-end-line ;; the line delimiting the end of source blocks.
-   ((t (:foreground "#008ED1" :background "#333" :extend t)))))
+   ((t (:foreground "#666" :background "#333" :extend t)))))
+
+(setq org-emphasis-alist
+      '(("*" (bold :foreground "Orange"))
+        ("/" (italic :foreground "light blue"))
+        ("_" (underline))
+        ("=" (:foreground "green" :family "Mono"))
+        ("~" (:foreground "deep sky blue"))
+        ("+" (:strike-through t))))
 
 ;;;;;;;;;; global key binding ;;;;;;;;;;
 
@@ -189,22 +188,57 @@
 ;; cider mode enable history file
 (setq cider-repl-history-file "~/.cider-repl-history")
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; graphviz
+
+(require 'graphviz-dot-mode)
+(setq graphviz-dot-indent-width 4)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; plantuml
+
+(require 'plantuml-mode)
+(setq plant-uml-jar-path "/usr/share/plantuml/plantuml.jar")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org mode config
+
 (require 'org)
 (require 'org-bullets)
 (require 'cider)
+
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
    (clojure . t)
-   (shell . t)))
+   (shell . t)
+   (ditaa . t)
+   (plantuml . t)
+   (dot . t)))
+
 ;; specify clojure backend to use in org-mode
 (setq org-babel-clojure-backend 'cider)
 (setq org-babel-clojure-sync-nrepl-timeout nil)
+
 ;; useful keybindings when using clojure in org-mode
 (org-defkey org-mode-map "\C-x\C-e" 'cider-eval-last-sexp)
 (org-defkey org-mode-map "\C-x\C-d" 'cider-doc)
+
+(setq org-ditaa-jar-path "/usr/share/ditaa/ditaa.jar")
+(setq org-plantuml-jar-path "/usr/share/plantuml/plantuml.jar")
+(setq org-confirm-babel-evaluate nil)
+(setq org-babel-results-keyword "results") ;; make label lowercase
+
+;; force display of images after execute
+(add-hook 'org-babel-after-execute-hook
+          (lambda ()
+            (condition-case nil
+                (org-display-inline-images)
+              (error nil)))
+          'append)
+
 ;; turn on visual-line-mode for org-mode
 (add-hook 'org-mode-hook
           (lambda ()
@@ -212,19 +246,21 @@
             (display-line-numbers-mode -1)
             (whitespace-mode -1)
             (turn-on-visual-line-mode)))
+
 (setq org-hide-emphasis-markers t)
 (setq org-src-tab-acts-natively t)
-(setq org-confirm-babel-evaluate nil)
 (setq org-edit-src-content-indentation 0)
 (setq org-src-fontify-natively t)
 (setq org-src-preserve-indentation nil)
 (setq org-pretty-entities t)
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+(setq org-latex-packages-alist '(("margin=2cm" "geometry" nil)))
+
 (set-face-attribute 'org-meta-line nil
                     :height 0.8
                     :slant 'normal
                     ;; :foreground "black"
                     :weight 'light)
-(setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TRAMP
