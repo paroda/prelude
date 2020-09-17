@@ -4,6 +4,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; temp issue with https
+;; (setq
+;;  package-archives
+;; '(("gnu" . "http://elpa.gnu.org/packages/")
+;;   ("melpa" . "https://melpa.org/packages/")))
+
 ;; Add a directory to our load path so that when you `load` things
 ;; below, Emacs knows where to look for the corresponding file.
 (add-to-list 'load-path (expand-file-name "modules" prelude-personal-dir))
@@ -15,6 +21,7 @@
 
     graphviz-dot-mode
     plantuml-mode
+    gnuplot
 
     paredit
     edn ;; needed for other clojure package
@@ -37,6 +44,8 @@
     treemacs-icons-dired
     treemacs-magit
 
+    perspective
+    helm-rg
     persistent-scratch
     doom-modeline
     counsel))
@@ -60,6 +69,12 @@
 (if (version<= "26.0.50" emacs-version)
     (global-display-line-numbers-mode)
   (global-linum-mode))
+
+;; perspective
+
+(require 'perspective)
+(persp-mode)
+(global-set-key (kbd "C-x C-b") 'persp-ibuffer)
 
 ;;;;;;;;; darkokai theme ;;;;;;;;;;;;;
 
@@ -100,7 +115,8 @@
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 
 ;; shows a list of buffers
-(global-set-key (kbd "C-x C-b") 'ibuffer)
+;; (global-set-key (kbd "C-x C-b") 'ibuffer) ;; switched to persp-ibuffer
+
 
 ;; configure comment tool
 (defun toggle-comment-on-line ()
@@ -120,6 +136,11 @@
 (require 'highlight-symbol)
 (global-set-key (kbd "C-.") 'highlight-symbol-at-point)
 (define-key flyspell-mode-map (kbd "C-.") nil)
+
+;; hydra-ibuffer menu
+(require 'hydra-ibuffer)
+(define-key ibuffer-mode-map "." 'hydra-ibuffer-main/body)
+(add-hook 'ibuffer-hook #'hydra-ibuffer-main/body)
 
 (require 'smartparens)
 (smartparens-global-mode)
@@ -198,7 +219,8 @@
 ;; plantuml
 
 (require 'plantuml-mode)
-(setq plant-uml-jar-path "/usr/share/plantuml/plantuml.jar")
+(setq plantuml-server-url "http://www.plantuml.com/plantuml")
+(setq plant-uml-jar-path (expand-file-name "~/sdk/plantuml.jar"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org mode config
@@ -216,7 +238,9 @@
    (shell . t)
    (ditaa . t)
    (plantuml . t)
-   (dot . t)))
+   (dot . t)
+   (js . t)
+   (gnuplot . t)))
 
 ;; specify clojure backend to use in org-mode
 (setq org-babel-clojure-backend 'cider)
@@ -227,9 +251,14 @@
 (org-defkey org-mode-map "\C-x\C-d" 'cider-doc)
 
 (setq org-ditaa-jar-path "/usr/share/ditaa/ditaa.jar")
-(setq org-plantuml-jar-path "/usr/share/plantuml/plantuml.jar")
+(setq org-plantuml-jar-path (expand-file-name "~/sdk/plantuml.jar"))
 (setq org-confirm-babel-evaluate nil)
 (setq org-babel-results-keyword "results") ;; make label lowercase
+
+(defun org-babel-plantuml-make-body (body params)
+  (let ((assignments (org-babel-variable-assignments:plantuml params)))
+    (org-babel-expand-body:generic body params assignments)))
+
 
 ;; force display of images after execute
 (add-hook 'org-babel-after-execute-hook

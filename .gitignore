@@ -29,3 +29,5 @@ prelude-cheatsheet.log
 .cache/
 .persistent-scratch
 transient/
+/.org-id-locations
+/personal/flycheck_init.el
