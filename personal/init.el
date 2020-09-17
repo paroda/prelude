@@ -18,24 +18,24 @@
 (defvar my-packages
   '(org
     org-bullets
-
+    ob-http
+    markdown-mode
     graphviz-dot-mode
     plantuml-mode
     gnuplot
 
-    paredit
+    ;; paredit
     edn ;; needed for other clojure package
     cider
+    clojure-mode-extra-font-locking
     flycheck
     flycheck-pos-tip
     flycheck-joker
     flycheck-clj-kondo
-    clj-refactor
-    clojure-mode-extra-font-locking
 
-    magit-gitflow
-    markdown-mode
     darkokai-theme
+    doom-themes
+    doom-modeline
     highlight-symbol
     all-the-icons
 
@@ -44,10 +44,10 @@
     treemacs-icons-dired
     treemacs-magit
 
+    magit-gitflow
     perspective
     helm-rg
     persistent-scratch
-    doom-modeline
     counsel))
 
 (dolist (p my-packages)
@@ -66,9 +66,10 @@
 (setq super-save-remote-files nil)
 
 ;; Show line numbers
-(if (version<= "26.0.50" emacs-version)
-    (global-display-line-numbers-mode)
-  (global-linum-mode))
+;; (if (version<= "26.0.50" emacs-version)
+;;     (global-display-line-numbers-mode)
+;;   (global-linum-mode))
+(setq nlinum-highlight-current-line t)
 
 ;; perspective
 
@@ -77,27 +78,47 @@
 (global-set-key (kbd "C-x C-b") 'persp-ibuffer)
 
 ;;;;;;;;; darkokai theme ;;;;;;;;;;;;;
+;;
+;; (require 'darkokai-theme)
+;; (setq darkokai-mode-line-padding 1)
+;; (load-theme 'darkokai t)
+;;
+;; (custom-theme-set-faces
+;;  'darkokai
+;;  '(org-block-begin-line ;; the line delimiting the begin of source blocks
+;;    ((t (:foreground "#666" :background "#333" :extend t))))
+;;  '(org-block ;; the source block background
+;;    ((t (:foreground "#FFFFEA" :background "#000" :extend t))))
+;;  '(org-block-end-line ;; the line delimiting the end of source blocks.
+;;    ((t (:foreground "#666" :background "#333" :extend t)))))
+;;
+;; (setq org-emphasis-alist
+;;       '(("*" (bold :foreground "Orange"))
+;;         ("/" (italic :foreground "light blue"))
+;;         ("_" (underline))
+;;         ("=" (:foreground "green" :family "Mono"))
+;;         ("~" (:foreground "deep sky blue"))
+;;         ("+" (:strike-through t))))
 
-(require 'darkokai-theme)
-(setq darkokai-mode-line-padding 1)
-(load-theme 'darkokai t)
+;;;;;;;;;;; doom theme ;;;;;;;;;;;;
 
-(custom-theme-set-faces
- 'darkokai
- '(org-block-begin-line ;; the line delimiting the begin of source blocks
-   ((t (:foreground "#666" :background "#333" :extend t))))
- '(org-block ;; the source block background
-   ((t (:foreground "#FFFFEA" :background "#000" :extend t))))
- '(org-block-end-line ;; the line delimiting the end of source blocks.
-   ((t (:foreground "#666" :background "#333" :extend t)))))
+(require 'doom-themes)
+(setq doom-themes-enable-bold t
+      doom-themes-enable-italic t)
+;; (load-theme 'doom-one t)
+(load-theme 'doom-nord t)
+;; (load-theme 'doom-moonlight t)
+;; (load-theme 'doom-opera t)
 
-(setq org-emphasis-alist
-      '(("*" (bold :foreground "Orange"))
-        ("/" (italic :foreground "light blue"))
-        ("_" (underline))
-        ("=" (:foreground "green" :family "Mono"))
-        ("~" (:foreground "deep sky blue"))
-        ("+" (:strike-through t))))
+;; enable flashing mode-line on errors
+(doom-themes-visual-bell-config)
+
+;; enable custom treemacs theme
+(setq doom-themes-treemacs-theme "doom-colors")
+(doom-themes-treemacs-config)
+
+;; fix and improve org mode native fontification
+(doom-themes-org-config)
 
 ;;;;;;;;;; global key binding ;;;;;;;;;;
 
@@ -145,23 +166,23 @@
 (require 'smartparens)
 (smartparens-global-mode)
 
-(require 'paredit)
+;; (require 'paredit)
 (require 'cider)
-(add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-(add-hook 'clojure-mode-hook 'paredit-mode)
-(add-hook 'cider-repl-mode-hook 'paredit-mode)
+;; (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+;; (add-hook 'clojure-mode-hook 'paredit-mode)
+;; (add-hook 'cider-repl-mode-hook 'paredit-mode)
 
 ;; A little more syntax highlighting
 (require 'clojure-mode-extra-font-locking)
 
-(require 'clj-refactor)
-(add-hook 'clojure-mode-hook
-          (lambda ()
-            (clj-refactor-mode 1)
-            (yas-minor-mode 1) ; for adding require/use/import statements
-            ;; insert keybinding setup here
-            ;; NOTE: this choice leaves cider-macroexpand-1 unbound
-            (cljr-add-keybindings-with-prefix "C-c C-m")))
+;; (require 'clj-refactor)
+;; (add-hook 'clojure-mode-hook
+;;           (lambda ()
+;;             (clj-refactor-mode 1)
+;;             (yas-minor-mode 1) ; for adding require/use/import statements
+;;             ;; insert keybinding setup here
+;;             ;; NOTE: this choice leaves cider-macroexpand-1 unbound
+;;             (cljr-add-keybindings-with-prefix "C-c C-m")))
 
 ;; enable pretty lambda (replace fn keyword with greek letter)
 (require 'clojure-pretty-lambda)
@@ -169,7 +190,7 @@
 (add-hook 'cider-repl-mode-hook 'clojure-pretty-lambda-mode)
 
 ;; enable cider repl pprint using fipp
-(setq cider-pprint-fn 'fipp)
+(setq cider-print-fn 'fipp)
 (setq cider-repl-use-pretty-printing t)
 
 ;; add short cut for cider-repl-clear-buffer
@@ -201,10 +222,10 @@
             (setq next-error-function #'flycheck-next-error-function)))
 
 ;; cider repl mode hide line numbers
-(add-hook 'cider-repl-mode
-          (lambda ()
-            (linum-mode -1)
-            (display-line-numbers-mode -1)))
+;; (add-hook 'cider-repl-mode
+;;           (lambda ()
+;;             (linum-mode -1)
+;;             (display-line-numbers-mode -1)))
 
 ;; cider mode enable history file
 (setq cider-repl-history-file "~/.cider-repl-history")
@@ -227,6 +248,7 @@
 
 (require 'org)
 (require 'org-bullets)
+(require 'ob-http)
 (require 'cider)
 
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
@@ -234,12 +256,13 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
-   (clojure . t)
    (shell . t)
+   (clojure . t)
+   (js . t)
+   (http . t)
    (ditaa . t)
    (plantuml . t)
    (dot . t)
-   (js . t)
    (gnuplot . t)))
 
 ;; specify clojure backend to use in org-mode
@@ -269,27 +292,27 @@
           'append)
 
 ;; turn on visual-line-mode for org-mode
-(add-hook 'org-mode-hook
-          (lambda ()
-            (linum-mode -1)
-            (display-line-numbers-mode -1)
-            (whitespace-mode -1)
-            (turn-on-visual-line-mode)))
-
-(setq org-hide-emphasis-markers t)
-(setq org-src-tab-acts-natively t)
-(setq org-edit-src-content-indentation 0)
-(setq org-src-fontify-natively t)
-(setq org-src-preserve-indentation nil)
-(setq org-pretty-entities t)
-(setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (linum-mode -1)
+;;             (display-line-numbers-mode -1)
+;;             (whitespace-mode -1)
+;;             (turn-on-visual-line-mode)))
+;;
+;; (setq org-hide-emphasis-markers t)
+;; (setq org-src-tab-acts-natively t)
+;; (setq org-edit-src-content-indentation 0)
+;; (setq org-src-fontify-natively t)
+;; (setq org-src-preserve-indentation nil)
+;; (setq org-pretty-entities t)
+;; (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
 (setq org-latex-packages-alist '(("margin=2cm" "geometry" nil)))
 
-(set-face-attribute 'org-meta-line nil
-                    :height 0.8
-                    :slant 'normal
-                    ;; :foreground "black"
-                    :weight 'light)
+;; (set-face-attribute 'org-meta-line nil
+;;                     :height 0.8
+;;                     :slant 'normal
+;;                     ;; :foreground "black"
+;;                     :weight 'light)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TRAMP
@@ -373,7 +396,7 @@
         treemacs-deferred-git-apply-delay      0.5
         treemacs-display-in-side-window        t
         treemacs-eldoc-display                 t
-        treemacs-file-event-delay              5000
+        treemacs-file-event-delay              1000 ; 5000
         treemacs-file-follow-delay             0.2
         treemacs-follow-after-init             t
         treemacs-git-command-pipe              ""
@@ -397,7 +420,7 @@
         treemacs-show-hidden-files             t
         treemacs-silent-filewatch              nil
         treemacs-silent-refresh                nil
-        treemacs-sorting                       'alphabetic-desc
+        treemacs-sorting                       'alphabetic-asc
         treemacs-space-between-root-nodes      t
         treemacs-tag-follow-cleanup            t
         treemacs-tag-follow-delay              1.5
@@ -442,6 +465,8 @@
                                (height . 30) ; lines
                                (vertical-scroll-bars . nil)
                                (horizontal-scroll-bars . nil)
-                               (font . "InputMono-11"))))
+                               ;;(font . "InputMono-11")
+                               ))
+  (menu-bar-mode -1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
