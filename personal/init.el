@@ -71,12 +71,6 @@
 ;;   (global-linum-mode))
 (setq nlinum-highlight-current-line t)
 
-;; perspective
-
-(require 'perspective)
-(persp-mode)
-(global-set-key (kbd "C-x C-b") 'persp-ibuffer)
-
 ;;;;;;;;; darkokai theme ;;;;;;;;;;;;;
 ;;
 ;; (require 'darkokai-theme)
@@ -105,8 +99,9 @@
 (require 'doom-themes)
 (setq doom-themes-enable-bold t
       doom-themes-enable-italic t)
-;; (load-theme 'doom-one t)
-(load-theme 'doom-nord t)
+(load-theme 'doom-one t)
+;; (load-theme 'doom-sourcerer)
+;; (load-theme 'doom-nord t)
 ;; (load-theme 'doom-moonlight t)
 ;; (load-theme 'doom-opera t)
 
@@ -448,6 +443,15 @@
   (define-key global-map (kbd "C-x t M-t") 'treemacs-find-tag)
 
   (define-key treemacs-mode-map [mouse-1] 'treemacs-single-click-expand-action))
+
+;; perspective
+
+(require 'perspective)
+(persp-mode)
+(global-set-key (kbd "C-x C-b") 'persp-ibuffer)
+
+;; integrate treemacs to follow perspective
+(require 'treemacs-perspective)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; GUI Only!!
