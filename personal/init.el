@@ -457,7 +457,7 @@
       '(""
         (:eval (or (persp-current-name) "Prelude"))
         " - "
-        (:eval (if (buffer-file-name) (abbreviate-file-name ...) "%b"))))
+        (:eval (if (buffer-file-name) (abbreviate-file-name (buffer-file-name)) "%b"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; GUI Only!!
