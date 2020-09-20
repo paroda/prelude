@@ -14,28 +14,39 @@
           (lambda ()
             ;; (message "persp-before-switch")
             (let ((p (persp-current-name))
-                  (w (treemacs-workspace->name (treemacs-current-workspace))))
+                  (w (treemacs-workspace->name (treemacs-current-workspace)))
+                  (tr (if (--filter (string-match "Treemacs-Scoped-Buffer"
+                                                  (buffer-name (window-buffer it)))
+                                    (window-list))
+                          t))
+                  (wnd (car (window-list))))
               ;; (message "persp-before-switch: %s %s" p w)
               (->> my-perspective-treemacs-ws
                    (--reject (string= (car it) p))
-                   (cons (list p w))
+                   (cons (list p w tr wnd))
                    (setq my-perspective-treemacs-ws)))))
 
-(add-hook 'persp-activated-hook
+(add-hook 'persp-switch-hook
           (lambda ()
-            ;; (message "persp-activated")
+            ;; (message "persp-switch")
             (let* ((p (persp-current-name))
-                   (w (car (cdr (--first (string= (car it) p)
-                                         my-perspective-treemacs-ws)))))
-              ;; (message "persp-activated: %s %s" p w)
+                   (v (cdr (--first (string= (car it) p)
+                                    my-perspective-treemacs-ws)))
+                   (w (car v))
+                   (tr (car (cdr v)))
+                   (wnd (car (cdr (cdr v)))))
+              ;; (message "persp-switch: %s %s" p w)
               (if w
-                  (let* ((ws (--map (cons (treemacs-workspace->name it) it)
-                                    treemacs--workspaces))
-                         (sel (cdr (--first (string= (car it) w) ws))))
-                    (setf (treemacs-current-workspace) sel)
-                    (treemacs--invalidate-buffer-project-cache)
-                    (treemacs--rerender-after-workspace-change)
-                    (run-hooks 'treemacs-switch-workspace-hook))))))
+                  (let ((sel (--first (string= (treemacs-workspace->name it) w)
+                                      treemacs--workspaces)))
+                    (when sel
+                      (setf (treemacs-current-workspace) sel)
+                      (treemacs--invalidate-buffer-project-cache)
+                      (treemacs--rerender-after-workspace-change)
+                      (run-hooks 'treemacs-switch-workspace-hook))))
+              (if tr (treemacs))
+              (if (--first (eq it wnd) (window-list))
+                  (select-window wnd)))))
 
 ;;;;
 

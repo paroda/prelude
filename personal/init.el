@@ -398,7 +398,7 @@
         treemacs-goto-tag-strategy             'refetch-index
         treemacs-indentation                   2
         treemacs-indentation-string            " "
-        treemacs-is-never-other-window         nil
+        treemacs-is-never-other-window         t
         treemacs-max-git-entries               5000
         treemacs-missing-project-action        'ask
         treemacs-no-png-images                 nil
@@ -412,7 +412,7 @@
         treemacs-recenter-after-project-jump   'always
         treemacs-recenter-after-project-expand 'on-distance
         treemacs-show-cursor                   nil
-        treemacs-show-hidden-files             t
+        treemacs-show-hidden-files             nil
         treemacs-silent-filewatch              nil
         treemacs-silent-refresh                nil
         treemacs-sorting                       'alphabetic-asc
@@ -452,6 +452,12 @@
 
 ;; integrate treemacs to follow perspective
 (require 'treemacs-perspective)
+
+(setq frame-title-format
+      '(""
+        (:eval (or (persp-current-name) "Prelude"))
+        " - "
+        (:eval (if (buffer-file-name) (abbreviate-file-name ...) "%b"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; GUI Only!!
