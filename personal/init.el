@@ -105,6 +105,13 @@
 ;; (load-theme 'doom-moonlight t)
 ;; (load-theme 'doom-opera t)
 
+;; highlight matching parentheses or braces when cusror is on one
+(set-face-attribute 'sp-show-pair-match-face nil :foreground "white" :background "#2257A0")
+
+;; popups
+(set-face-attribute 'tooltip nil :background "#334455")
+(set-face-attribute 'company-tooltip nil :background "#283644")
+
 ;; enable flashing mode-line on errors
 (doom-themes-visual-bell-config)
 
