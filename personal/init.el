@@ -54,6 +54,9 @@
   (when (not (package-installed-p p))
     (package-install p)))
 
+;; enable auto root mode open
+(crux-reopen-as-root-mode)
+
 ;; no need for ~ files when editing
 (setq create-lockfiles nil)
 
