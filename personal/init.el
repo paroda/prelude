@@ -24,7 +24,7 @@
     plantuml-mode
     gnuplot
 
-    ;; paredit
+    paredit
     edn ;; needed for other clojure package
     cider
     clojure-mode-extra-font-locking
@@ -171,11 +171,11 @@
 (require 'smartparens)
 (smartparens-global-mode)
 
-;; (require 'paredit)
+(require 'paredit)
 (require 'cider)
-;; (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-;; (add-hook 'clojure-mode-hook 'paredit-mode)
-;; (add-hook 'cider-repl-mode-hook 'paredit-mode)
+(add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+(add-hook 'clojure-mode-hook 'paredit-mode)
+(add-hook 'cider-repl-mode-hook 'paredit-mode)
 
 ;; A little more syntax highlighting
 (require 'clojure-mode-extra-font-locking)
