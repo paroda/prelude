@@ -55,9 +55,9 @@
 
 (defvar prelude-packages
   '(ace-window
+    ag
     avy
     anzu
-    beacon
     browse-kill-ring
     crux
     discover-my-major
@@ -141,7 +141,11 @@ PACKAGE is installed only if not already present.  The file is opened in MODE."
                                  (,mode)))))
 
 (defvar prelude-auto-install-alist
-  '(("\\.clj\\'" clojure-mode clojure-mode)
+  '(("\\.adoc\\'" adoc-mode adoc-mode)
+    ("\\.clj\\'" clojure-mode clojure-mode)
+    ("\\.cljc\\'" clojure-mode clojurec-mode)
+    ("\\.cljs\\'" clojure-mode clojurescript-mode)
+    ("\\.edn\\'" clojure-mode clojure-mode)
     ("\\.cmake\\'" cmake-mode cmake-mode)
     ("CMakeLists\\.txt\\'" cmake-mode cmake-mode)
     ("\\.coffee\\'" coffee-mode coffee-mode)
