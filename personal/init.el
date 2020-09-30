@@ -485,8 +485,9 @@
                                (height . 30) ; lines
                                (vertical-scroll-bars . nil)
                                (horizontal-scroll-bars . nil)
-                               ;;(font . "InputMono-11")
+                               (font . "InputMono-11")
                                ))
-  (menu-bar-mode -1))
+  (menu-bar-mode -1)
+  (setq vterm-shell "/usr/bin/fish"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
