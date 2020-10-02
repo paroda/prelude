@@ -44,6 +44,7 @@
     treemacs-icons-dired
     treemacs-magit
 
+    fish-mode
     eterm-256color
     magit-gitflow
     perspective
@@ -471,6 +472,44 @@
         (:eval (if (buffer-file-name) (abbreviate-file-name (buffer-file-name)) "%b"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'eterm-256color)
+(add-hook 'term-mode-hook #'eterm-256color-mode)
+
+(defvar vterm-minor-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-a") 'vterm--self-insert)
+    (define-key map (kbd "C-e") 'vterm--self-insert)
+    map)
+  "Keymap for VTerm minor mode.")
+
+;; must define it before loading vterm
+(define-minor-mode vterm-minor-mode
+  "Minor mode for VTerm"
+  :lighter " vtl"
+  :keymap vterm-minor-mode-map
+  :global nil)
+
+;; setup vterm
+(when (package-installed-p 'vterm)
+  (require 'vterm)
+  ;; * you need to manually install vterm and fish and configure them.
+  ;;   this will not auto install them. it only adds some settings,
+  ;;   which are ignored in the absence of required components.
+  (setq vterm-term-environment-variable "eterm-256color")
+  (setq vterm-shell (or (executable-find "fish")
+                        (executable-find "bash")))
+  (setq vterm-buffer-name-string "vterm:%s")
+  (setq vterm-kill-buffer-on-exit t)
+  (setq vterm-copy-exclude-prompt t)
+
+  (add-hook 'vterm-mode-hook 'vterm-minor-mode)
+  (define-key vterm-copy-mode-map (kbd "C-a") 'vterm-beginning-of-line)
+  (define-key vterm-copy-mode-map (kbd "C-e") 'vterm-end-of-line)
+  (define-key prelude-mode-map (kbd "C-c t") 'vterm)
+  (define-key prelude-mode-map (kbd "C-c T") 'vterm-other-window))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; GUI Only!!
 
 (when (display-graphic-p)
@@ -488,24 +527,6 @@
                                (horizontal-scroll-bars . nil)
                                (font . "InputMono-11")
                                ))
-  (menu-bar-mode -1)
-
-  (require 'eterm-256color)
-  (add-hook 'term-mode-hook #'eterm-256color-mode)
-
-  ;; setup vterm
-  (when (package-installed-p 'vterm)
-    (require 'vterm)
-    ;; * you need to manually install vterm and fish and configure them.
-    ;;   this will not auto install them. it only adds some settings,
-    ;;   which are ignored in the absence of required components.
-    (setq vterm-term-environment-variable "eterm-256color")
-    (setq vterm-shell (or (executable-find "fish")
-                          (executable-find "bash")))
-    (setq vterm-buffer-name-string "vterm:%s")
-    (setq vterm-kill-buffer-on-exit t)
-    (setq vterm-copy-exclude-prompt t)
-    (define-key prelude-mode-map (kbd "C-c t") 'vterm)
-    (define-key prelude-mode-map (kbd "C-c T") 'vterm-other-window)))
+  (menu-bar-mode -1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
