@@ -44,6 +44,7 @@
     treemacs-icons-dired
     treemacs-magit
 
+    eterm-256color
     magit-gitflow
     perspective
     helm-rg
@@ -488,6 +489,23 @@
                                (font . "InputMono-11")
                                ))
   (menu-bar-mode -1)
-  (setq vterm-shell "/usr/bin/fish"))
+
+  (require 'eterm-256color)
+  (add-hook 'term-mode-hook #'eterm-256color-mode)
+
+  ;; setup vterm
+  (when (package-installed-p 'vterm)
+    (require 'vterm)
+    ;; * you need to manually install vterm and fish and configure them.
+    ;;   this will not auto install them. it only adds some settings,
+    ;;   which are ignored in the absence of required components.
+    (setq vterm-term-environment-variable "eterm-256color")
+    (setq vterm-shell (or (executable-find "fish")
+                          (executable-find "bash")))
+    (setq vterm-buffer-name-string "vterm:%s")
+    (setq vterm-kill-buffer-on-exit t)
+    (setq vterm-copy-exclude-prompt t)
+    (define-key prelude-mode-map (kbd "C-c t") 'vterm)
+    (define-key prelude-mode-map (kbd "C-c T") 'vterm-other-window)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
