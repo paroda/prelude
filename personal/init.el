@@ -478,8 +478,9 @@
 
 (defvar vterm-minor-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-a") 'vterm--self-insert)
-    (define-key map (kbd "C-e") 'vterm--self-insert)
+    (define-key map (kbd "C-a") 'vterm-send-C-a)
+    (define-key map (kbd "C-e") 'vterm-send-C-e)
+    (define-key map (kbd "C-c C-y") 'vterm-send-C-y)
     map)
   "Keymap for VTerm minor mode.")
 
