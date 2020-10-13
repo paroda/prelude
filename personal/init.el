@@ -127,6 +127,17 @@
 ;; fix and improve org mode native fontification
 (doom-themes-org-config)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; enable doom-modeline
+
+(require 'doom-modeline)
+(add-hook 'after-init-hook #'doom-modeline-mode)
+
+(add-hook 'calc-mode-hook
+          (lambda ()
+            (setq mode-line-format '("%e" mode-line-buffer-identification
+                                     (:eval (doom-modeline-format--main))))))
+
 ;;;;;;;;;; global key binding ;;;;;;;;;;
 
 ;; hot key for switching window
@@ -172,6 +183,11 @@
 
 (require 'smartparens)
 (smartparens-global-mode)
+(smartparens-global-strict-mode)
+
+(require 'js2-refactor)
+(add-hook 'js2-mode-hook #'js2-refactor-mode)
+(js2r-add-keybindings-with-prefix "C-c C-r")
 
 (require 'paredit)
 (require 'cider)
@@ -386,12 +402,6 @@
 (persistent-scratch-setup-default)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; enable doom-modeline
-
-(require 'doom-modeline)
-(doom-modeline-mode 1)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; treemacs setup
 
 (require 'treemacs)
@@ -526,8 +536,18 @@
                                (height . 30) ; lines
                                (vertical-scroll-bars . nil)
                                (horizontal-scroll-bars . nil)
-                               (font . "InputMono-11")
+                               ;; (font . "InputMono-11")
+                               ;; (font . "FiraCode-11")
+                               (font . "DejaVuSansMono-11")
                                ))
-  (menu-bar-mode -1))
+  (menu-bar-mode -1)
+
+  ;; ;; unicode font support
+  ;; (require 'list-utils)
+  ;; (require 'persistent-soft)
+  ;; (require 'unicode-fonts)
+  ;; (unicode-fonts-setup)
+
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
