@@ -33,6 +33,8 @@
     flycheck-joker
     flycheck-clj-kondo
 
+    js2-refactor
+
     darkokai-theme
     doom-themes
     doom-modeline
@@ -74,7 +76,13 @@
 ;; (if (version<= "26.0.50" emacs-version)
 ;;     (global-display-line-numbers-mode)
 ;;   (global-linum-mode))
+(require 'nlinum)
 (setq nlinum-highlight-current-line t)
+(global-nlinum-mode -1)
+(dolist (m '(emacs-lisp-mode-hook
+             clojure-mode-hook clojurescript-mode-hook
+             js-mode-hook js2-mode-hook web-mode-hook css-mode-hook))
+  (add-hook m 'nlinum-mode))
 
 ;;;;;;;;; darkokai theme ;;;;;;;;;;;;;
 ;;
@@ -191,9 +199,9 @@
 
 (require 'paredit)
 (require 'cider)
-(add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-(add-hook 'clojure-mode-hook 'paredit-mode)
-(add-hook 'cider-repl-mode-hook 'paredit-mode)
+(dolist (m '(emacs-lisp-mode-hook
+             clojure-mode-hook clojurescript-mode-hook cider-repl-mode-hook))
+  (add-hook m 'paredit-mode))
 
 ;; A little more syntax highlighting
 (require 'clojure-mode-extra-font-locking)
@@ -209,8 +217,8 @@
 
 ;; enable pretty lambda (replace fn keyword with greek letter)
 (require 'clojure-pretty-lambda)
-(add-hook 'clojure-mode-hook 'clojure-pretty-lambda-mode)
-(add-hook 'cider-repl-mode-hook 'clojure-pretty-lambda-mode)
+(dolist (m '(clojure-mode-hook clojurescript-mode-hook cider-repl-mode-hook))
+  (add-hook m 'clojure-pretty-lambda-mode))
 
 ;; enable cider repl pprint using fipp
 (setq cider-print-fn 'fipp)
@@ -391,9 +399,9 @@
 (progn
   (define-key hs-minor-mode-map (kbd "C-t") 'hs-toggle-hiding)
   (define-key hs-minor-mode-map (kbd "C-S-t") 'hs-hide-all))
-(add-hook 'clojure-mode-hook 'hs-minor-mode)
-(add-hook 'cider-mode-hook 'hs-minor-mode)
-(add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
+(dolist (m '(emacs-lisp-mode-hook
+             clojure-mode-hook clojurescript-mode-hook cider-mode-hook))
+  (add-hook m 'hs-minor-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; persistent scratch buffer
@@ -514,7 +522,12 @@
   (setq vterm-kill-buffer-on-exit t)
   (setq vterm-copy-exclude-prompt t)
 
-  (add-hook 'vterm-mode-hook 'vterm-minor-mode)
+  (add-hook 'vterm-mode-hook
+            (lambda ()
+              (vterm-minor-mode 1)
+              (set (make-local-variable 'buffer-face-mode-face)
+                   '(:family "FiraMono" :height 110))
+              (buffer-face-mode t)))
   (define-key vterm-copy-mode-map (kbd "C-a") 'vterm-beginning-of-line)
   (define-key vterm-copy-mode-map (kbd "C-e") 'vterm-end-of-line)
   (define-key prelude-mode-map (kbd "C-c t") 'vterm)
@@ -530,24 +543,31 @@
   (treemacs-icons-dired-mode)
 
   (setq frame-resize-pixelwise t) ;; fix full-size issue on Xming
-  (setq default-frame-alist  '((left . 50)
-                               (top . 50)
-                               (width . 90)  ; chars
-                               (height . 30) ; lines
-                               (vertical-scroll-bars . nil)
-                               (horizontal-scroll-bars . nil)
-                               ;; (font . "InputMono-11")
-                               ;; (font . "FiraCode-11")
-                               (font . "DejaVuSansMono-11")
-                               ))
+  (setq default-frame-alist '(;; explicit size/position is useful only for GTK builds over X11
+                              ;; to overcome resize issue. Not required for LUCID builds
+                              ;; (left . 50)
+                              ;; (top . 50)
+                              ;; (width . 90)  ; chars
+                              ;; (height . 30) ; lines
+                              (vertical-scroll-bars . nil)
+                              (horizontal-scroll-bars . nil)
+                              ;; (font . "InputMono-11")
+                              ;; (font . "FiraCode-11")
+                              (font . "DejaVuSansMono-11")
+                              ))
   (menu-bar-mode -1)
 
-  ;; ;; unicode font support
-  ;; (require 'list-utils)
-  ;; (require 'persistent-soft)
-  ;; (require 'unicode-fonts)
-  ;; (unicode-fonts-setup)
+  )
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; unicode font support
+(lambda ()
+  ;; this is only meant for manual run just once if interested
+  ;; also you should ensure fonts are installed
+  (require 'list-utils)
+  (require 'unicode-fonts)
+  (unicode-fonts-setup)
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
