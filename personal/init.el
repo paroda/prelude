@@ -10,6 +10,13 @@
 ;; '(("gnu" . "http://elpa.gnu.org/packages/")
 ;;   ("melpa" . "https://melpa.org/packages/")))
 
+;; simplify yes/no prompt
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; Unbind unneeded keys
+(global-set-key (kbd "C-z") nil)
+(global-set-key (kbd "C-x C-z") nil)
+
 ;; Add a directory to our load path so that when you `load` things
 ;; below, Emacs knows where to look for the corresponding file.
 (add-to-list 'load-path (expand-file-name "modules" prelude-personal-dir))
@@ -34,6 +41,7 @@
     flycheck-clj-kondo
 
     js2-refactor
+    json-mode
 
     darkokai-theme
     doom-themes
@@ -50,6 +58,7 @@
     eterm-256color
     magit-gitflow
     perspective
+    ripgrep
     helm-rg
     persistent-scratch
     counsel))
@@ -58,8 +67,16 @@
   (when (not (package-installed-p p))
     (package-install p)))
 
+;; So Long mitigates slowness due to extremely long lines.
+;; Currently available in Emacs master branch *only*!
+(when (fboundp 'global-so-long-mode)
+  (global-so-long-mode))
+
 ;; enable auto root mode open
 (crux-reopen-as-root-mode)
+
+;; Ask before killing emacs
+(setq confirm-kill-emacs 'y-or-n-p)
 
 ;; no need for ~ files when editing
 (setq create-lockfiles nil)
@@ -73,39 +90,19 @@
 (setq super-save-remote-files nil)
 
 ;; Show line numbers
-;; (if (version<= "26.0.50" emacs-version)
-;;     (global-display-line-numbers-mode)
-;;   (global-linum-mode))
 (require 'nlinum)
 (setq nlinum-highlight-current-line t)
 (global-nlinum-mode -1)
-(dolist (m '(emacs-lisp-mode-hook
-             clojure-mode-hook clojurescript-mode-hook
-             js-mode-hook js2-mode-hook web-mode-hook css-mode-hook))
-  (add-hook m 'nlinum-mode))
+(add-hook 'text-mode-hook #'display-line-numbers-mode)
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
 
-;;;;;;;;; darkokai theme ;;;;;;;;;;;;;
-;;
-;; (require 'darkokai-theme)
-;; (setq darkokai-mode-line-padding 1)
-;; (load-theme 'darkokai t)
-;;
-;; (custom-theme-set-faces
-;;  'darkokai
-;;  '(org-block-begin-line ;; the line delimiting the begin of source blocks
-;;    ((t (:foreground "#666" :background "#333" :extend t))))
-;;  '(org-block ;; the source block background
-;;    ((t (:foreground "#FFFFEA" :background "#000" :extend t))))
-;;  '(org-block-end-line ;; the line delimiting the end of source blocks.
-;;    ((t (:foreground "#666" :background "#333" :extend t)))))
-;;
-;; (setq org-emphasis-alist
-;;       '(("*" (bold :foreground "Orange"))
-;;         ("/" (italic :foreground "light blue"))
-;;         ("_" (underline))
-;;         ("=" (:foreground "green" :family "Mono"))
-;;         ("~" (:foreground "deep sky blue"))
-;;         ("+" (:strike-through t))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; helper to switch themes cleanly without mixing up color palletes
+(defun switch-theme ()
+  "An interactive function to switch themes."
+  (interactive)
+  (disable-theme (intern (car (mapcar #'symbol-name custom-enabled-themes))))
+  (call-interactively #'load-theme))
 
 ;;;;;;;;;;; doom theme ;;;;;;;;;;;;
 
@@ -113,13 +110,10 @@
 (setq doom-themes-enable-bold t
       doom-themes-enable-italic t)
 (load-theme 'doom-one t)
-;; (load-theme 'doom-sourcerer)
-;; (load-theme 'doom-nord t)
-;; (load-theme 'doom-moonlight t)
-;; (load-theme 'doom-opera t)
 
 ;; highlight matching parentheses or braces when cusror is on one
-(set-face-attribute 'sp-show-pair-match-face nil :foreground "white" :background "#2257A0")
+(set-face-attribute 'sp-show-pair-match-face nil
+                    :foreground "white" :background "#2257A0")
 
 ;; popups
 (set-face-attribute 'tooltip nil :background "#334455")
@@ -196,6 +190,9 @@
 (require 'js2-refactor)
 (add-hook 'js2-mode-hook #'js2-refactor-mode)
 (js2r-add-keybindings-with-prefix "C-c C-r")
+
+(require 'json-mode)
+(add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
 
 (require 'paredit)
 (require 'cider)
@@ -361,6 +358,8 @@
 ;; counsel
 (require 'counsel)
 (global-set-key (kbd "C-x 8 RET") 'counsel-unicode-char)
+(global-set-key (kbd "C-z s") 'swiper-isearch-thing-at-point)
+(global-set-key (kbd "C-z g") 'counsel-rg)
 
 (defadvice projectile-project-root (around ignore-remote first activate)
   (unless (file-remote-p default-directory) ad-do-it))
