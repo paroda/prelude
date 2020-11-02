@@ -58,28 +58,16 @@
     eterm-256color
     magit-gitflow
     perspective
+    counsel-projectile
     ripgrep
-    helm-rg
-    persistent-scratch
-    counsel))
+    persistent-scratch))
 
 (dolist (p my-packages)
   (when (not (package-installed-p p))
     (package-install p)))
 
-;; So Long mitigates slowness due to extremely long lines.
-;; Currently available in Emacs master branch *only*!
-(when (fboundp 'global-so-long-mode)
-  (global-so-long-mode))
-
-;; enable auto root mode open
-(crux-reopen-as-root-mode)
-
-;; Ask before killing emacs
-(setq confirm-kill-emacs 'y-or-n-p)
-
-;; no need for ~ files when editing
-(setq create-lockfiles nil)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; override prelude
 
 ;; disable flyspell
 (setq prelude-flyspell nil)
@@ -89,20 +77,9 @@
 (super-save-mode -1)
 (setq super-save-remote-files nil)
 
-;; Show line numbers
-(require 'nlinum)
-(setq nlinum-highlight-current-line t)
-(global-nlinum-mode -1)
-(add-hook 'text-mode-hook #'display-line-numbers-mode)
-(add-hook 'prog-mode-hook #'display-line-numbers-mode)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; helper to switch themes cleanly without mixing up color palletes
-(defun switch-theme ()
-  "An interactive function to switch themes."
-  (interactive)
-  (disable-theme (intern (car (mapcar #'symbol-name custom-enabled-themes))))
-  (call-interactively #'load-theme))
+;; customize ivy over prelude defaults
+(setq ivy-count-format "%d/%d ")
+(setq ivy-sort-matches-functions-alist '((t . nil)))
 
 ;;;;;;;;;;; doom theme ;;;;;;;;;;;;
 
@@ -134,30 +111,73 @@
 
 (require 'doom-modeline)
 (add-hook 'after-init-hook #'doom-modeline-mode)
-
 (add-hook 'calc-mode-hook
           (lambda ()
             (setq mode-line-format '("%e" mode-line-buffer-identification
                                      (:eval (doom-modeline-format--main))))))
 
-;;;;;;;;;; global key binding ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; hot key for switching window
-(global-set-key (kbd "M-p") 'ace-window)
-
-;; short cut for vc refresh state
+;; hotkey for vc refresh state
 (global-set-key (kbd "C-x v 0") 'vc-refresh-state)
 
-;; Interactive search key bindings. By default, C-s runs
-;; isearch-forward, so this swaps the bindings.
-(global-set-key (kbd "C-s") 'isearch-forward-regexp)
-(global-set-key (kbd "C-r") 'isearch-backward-regexp)
-(global-set-key (kbd "C-M-s") 'isearch-forward)
-(global-set-key (kbd "C-M-r") 'isearch-backward)
+(global-set-key (kbd "C-x k") 'kill-current-buffer)
 
-;; shows a list of buffers
-;; (global-set-key (kbd "C-x C-b") 'ibuffer) ;; switched to persp-ibuffer
+;; counsel
+(require 'counsel)
+(require 'counsel-projectile)
+(counsel-projectile-mode)
+(global-set-key (kbd "C-z s a") 'counsel-ag)
+(global-set-key (kbd "C-z s r") 'counsel-rg)
 
+;; So Long mitigates slowness due to extremely long lines.
+;; Currently available in Emacs master branch *only*!
+(when (fboundp 'global-so-long-mode)
+  (global-so-long-mode))
+
+;; Ask before killing emacs
+(setq confirm-kill-emacs 'y-or-n-p)
+
+;; no need for ~ files when editing
+(setq create-lockfiles nil)
+
+;; enable auto root mode open
+(crux-reopen-as-root-mode)
+
+(require 'smartparens)
+(smartparens-global-mode)
+(smartparens-global-strict-mode)
+
+;; keep scratch buffer on restart
+(require 'persistent-scratch)
+(persistent-scratch-setup-default)
+
+;; enable git flow
+(require 'magit-gitflow)
+(add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
+
+;; Syntax highlighting
+(require 'highlight-symbol)
+(require 'flyspell)
+(global-set-key (kbd "C-.") 'highlight-symbol-at-point)
+(define-key flyspell-mode-map (kbd "C-.") nil)
+
+;; hideshow setup
+(require 'hideshow)
+(progn
+  (define-key hs-minor-mode-map (kbd "C-t") 'hs-toggle-hiding)
+  (define-key hs-minor-mode-map (kbd "C-S-t") 'hs-hide-all))
+(dolist (m '(emacs-lisp-mode-hook
+             clojure-mode-hook clojurescript-mode-hook cider-mode-hook))
+  (add-hook m 'hs-minor-mode))
+
+;; use paredit for clojure and elisp
+(require 'paredit)
+(require 'cider)
+(dolist (m '(emacs-lisp-mode-hook
+             clojure-mode-hook clojurescript-mode-hook cider-repl-mode-hook))
+  (add-hook m 'paredit-mode))
 
 ;; configure comment tool
 (defun toggle-comment-on-line ()
@@ -167,25 +187,22 @@
 (global-set-key (kbd "C-;") 'toggle-comment-on-line)
 (define-key flyspell-mode-map (kbd "C-;") nil)
 
+;; Show line numbers
+(require 'nlinum)
+(setq nlinum-highlight-current-line t)
+(global-nlinum-mode -1)
+(add-hook 'text-mode-hook #'display-line-numbers-mode)
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+
+;; helper to switch themes cleanly without mixing up color palletes
+(defun switch-theme ()
+  "An interactive function to switch themes."
+  (interactive)
+  (disable-theme (intern (car (mapcar #'symbol-name custom-enabled-themes))))
+  (call-interactively #'load-theme))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; enable git flow
-(require 'magit-gitflow)
-(add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
-
-;; Syntax highlighting
-(require 'highlight-symbol)
-(global-set-key (kbd "C-.") 'highlight-symbol-at-point)
-(define-key flyspell-mode-map (kbd "C-.") nil)
-
-;; hydra-ibuffer menu
-(require 'hydra-ibuffer)
-(define-key ibuffer-mode-map "." 'hydra-ibuffer-main/body)
-(add-hook 'ibuffer-hook #'hydra-ibuffer-main/body)
-
-(require 'smartparens)
-(smartparens-global-mode)
-(smartparens-global-strict-mode)
+;; javascript extra
 
 (require 'js2-refactor)
 (add-hook 'js2-mode-hook #'js2-refactor-mode)
@@ -194,33 +211,23 @@
 (require 'json-mode)
 (add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
 
-(require 'paredit)
-(require 'cider)
-(dolist (m '(emacs-lisp-mode-hook
-             clojure-mode-hook clojurescript-mode-hook cider-repl-mode-hook))
-  (add-hook m 'paredit-mode))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Clojure extra
 
 ;; A little more syntax highlighting
 (require 'clojure-mode-extra-font-locking)
-
-;; (require 'clj-refactor)
-;; (add-hook 'clojure-mode-hook
-;;           (lambda ()
-;;             (clj-refactor-mode 1)
-;;             (yas-minor-mode 1) ; for adding require/use/import statements
-;;             ;; insert keybinding setup here
-;;             ;; NOTE: this choice leaves cider-macroexpand-1 unbound
-;;             (cljr-add-keybindings-with-prefix "C-c C-m")))
 
 ;; enable pretty lambda (replace fn keyword with greek letter)
 (require 'clojure-pretty-lambda)
 (dolist (m '(clojure-mode-hook clojurescript-mode-hook cider-repl-mode-hook))
   (add-hook m 'clojure-pretty-lambda-mode))
 
+(require 'cider)
 ;; enable cider repl pprint using fipp
 (setq cider-print-fn 'fipp)
 (setq cider-repl-use-pretty-printing t)
-
+;; cider mode enable history file
+(setq cider-repl-history-file "~/.cider-repl-history")
 ;; add short cut for cider-repl-clear-buffer
 (define-key cider-repl-mode-map (kbd "C-c SPC") 'cider-repl-clear-buffer)
 
@@ -249,15 +256,6 @@
           (lambda ()
             (setq next-error-function #'flycheck-next-error-function)))
 
-;; cider repl mode hide line numbers
-;; (add-hook 'cider-repl-mode
-;;           (lambda ()
-;;             (linum-mode -1)
-;;             (display-line-numbers-mode -1)))
-
-;; cider mode enable history file
-(setq cider-repl-history-file "~/.cider-repl-history")
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; graphviz
 
@@ -277,7 +275,6 @@
 (require 'org)
 (require 'org-bullets)
 (require 'ob-http)
-(require 'cider)
 
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
@@ -319,28 +316,7 @@
               (error nil)))
           'append)
 
-;; turn on visual-line-mode for org-mode
-;; (add-hook 'org-mode-hook
-;;           (lambda ()
-;;             (linum-mode -1)
-;;             (display-line-numbers-mode -1)
-;;             (whitespace-mode -1)
-;;             (turn-on-visual-line-mode)))
-;;
-;; (setq org-hide-emphasis-markers t)
-;; (setq org-src-tab-acts-natively t)
-;; (setq org-edit-src-content-indentation 0)
-;; (setq org-src-fontify-natively t)
-;; (setq org-src-preserve-indentation nil)
-;; (setq org-pretty-entities t)
-;; (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
 (setq org-latex-packages-alist '(("margin=2cm" "geometry" nil)))
-
-;; (set-face-attribute 'org-meta-line nil
-;;                     :height 0.8
-;;                     :slant 'normal
-;;                     ;; :foreground "black"
-;;                     :weight 'light)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TRAMP
@@ -354,12 +330,6 @@
 ;; Tramp speed up by disabling some
 (require 'editorconfig)
 (editorconfig-mode -1)
-
-;; counsel
-(require 'counsel)
-(global-set-key (kbd "C-x 8 RET") 'counsel-unicode-char)
-(global-set-key (kbd "C-z s") 'swiper-isearch-thing-at-point)
-(global-set-key (kbd "C-z g") 'counsel-rg)
 
 (defadvice projectile-project-root (around ignore-remote first activate)
   (unless (file-remote-p default-directory) ad-do-it))
@@ -393,20 +363,19 @@
 (global-set-key (kbd "C-S-s") 'isearch-forward-symbol-at-point)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; hideshow setup
-(load-library "hideshow")
-(progn
-  (define-key hs-minor-mode-map (kbd "C-t") 'hs-toggle-hiding)
-  (define-key hs-minor-mode-map (kbd "C-S-t") 'hs-hide-all))
-(dolist (m '(emacs-lisp-mode-hook
-             clojure-mode-hook clojurescript-mode-hook cider-mode-hook))
-  (add-hook m 'hs-minor-mode))
+;; perspective
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; persistent scratch buffer
-
-(require 'persistent-scratch)
-(persistent-scratch-setup-default)
+(require 'perspective)
+(persp-mode)
+(global-set-key (kbd "C-x b") 'persp-ivy-switch-buffer)
+(global-set-key (kbd "C-x B") 'persp-counsel-switch-buffer)
+(global-set-key (kbd "C-x K") 'persp-kill-buffer*)
+(global-set-key (kbd "C-x C-b") 'persp-ibuffer)
+(setq frame-title-format
+      '(""
+        (:eval (or (persp-current-name) "Prelude"))
+        " - "
+        (:eval (if (buffer-file-name) (abbreviate-file-name (buffer-file-name)) "%b"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; treemacs setup
@@ -414,6 +383,7 @@
 (require 'treemacs)
 (require 'treemacs-projectile)
 (require 'treemacs-magit)
+(require 'treemacs-perspective)
 
 (progn
   (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
@@ -473,21 +443,6 @@
 
   (define-key treemacs-mode-map [mouse-1] 'treemacs-single-click-expand-action))
 
-;; perspective
-
-(require 'perspective)
-(persp-mode)
-(global-set-key (kbd "C-x C-b") 'persp-ibuffer)
-
-;; integrate treemacs to follow perspective
-(require 'treemacs-perspective)
-
-(setq frame-title-format
-      '(""
-        (:eval (or (persp-current-name) "Prelude"))
-        " - "
-        (:eval (if (buffer-file-name) (abbreviate-file-name (buffer-file-name)) "%b"))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'eterm-256color)
@@ -542,8 +497,9 @@
   (treemacs-icons-dired-mode)
 
   (setq frame-resize-pixelwise t) ;; fix full-size issue on Xming
-  (setq default-frame-alist '(;; explicit size/position is useful only for GTK builds over X11
-                              ;; to overcome resize issue. Not required for LUCID builds
+  (setq default-frame-alist '(;; Explicit size/position is useful only for
+                              ;; GTK builds over X11 to overcome resize issue.
+                              ;; Not required for LUCID builds
                               ;; (left . 50)
                               ;; (top . 50)
                               ;; (width . 90)  ; chars
@@ -561,12 +517,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; unicode font support
-(lambda ()
-  ;; this is only meant for manual run just once if interested
-  ;; also you should ensure fonts are installed
-  (require 'list-utils)
-  (require 'unicode-fonts)
-  (unicode-fonts-setup)
-  )
+;; (lambda ()
+;;   ;; this is only meant for manual run just once if interested
+;;   ;; also you should ensure fonts are installed
+;;   (require 'list-utils)
+;;   (require 'unicode-fonts)
+;;   (unicode-fonts-setup)
+;;   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
