@@ -31,6 +31,9 @@
     plantuml-mode
     gnuplot
 
+    ivy
+    ivy-rich
+
     paredit
     edn ;; needed for other clojure package
     cider
@@ -48,6 +51,7 @@
     doom-modeline
     highlight-symbol
     all-the-icons
+    unicode-fonts
 
     treemacs
     treemacs-projectile
@@ -78,8 +82,30 @@
 (setq super-save-remote-files nil)
 
 ;; customize ivy over prelude defaults
+(require 'ivy)
 (setq ivy-count-format "%d/%d ")
 (setq ivy-sort-matches-functions-alist '((t . nil)))
+;; (setq ivy-initial-inputs-alist nil) ;; uncomment it to remove "^" form search
+
+;; set minibuffer height for different commands
+(setf (alist-get 'counsel-projectile-ag ivy-height-alist) 15)
+(setf (alist-get 'counsel-projectile-rg ivy-height-alist) 15)
+(setf (alist-get 'swiper ivy-height-alist) 15)
+(setf (alist-get 'counsel-switch-buffer ivy-height-alist) 7)
+
+(require 'ivy-rich)
+(setq ivy-format-function #'ivy-format-function-line)
+(setq ivy-rich-display-transformers-list
+      (plist-put ivy-rich-display-transformers-list
+                 'ivy-switch-buffer
+                 '(:columns
+                   ((ivy-rich-candidate (:width 40))
+                    (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+                    (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
+                    (ivy-rich-switch-buffer-project (:width 15 :face success))
+                    (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
+                   :predicate (lambda (cand) t))))
+(ivy-rich-mode 1)
 
 ;;;;;;;;;;; doom theme ;;;;;;;;;;;;
 
@@ -117,7 +143,21 @@
                                      (:eval (doom-modeline-format--main))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun switch-theme ()
+  "An interactive function to cleanly switch themes"
+  (interactive)
+  (disable-theme (intern (car (mapcar #'symbol-name custom-enabled-themes))))
+  (call-interactively #'load-theme))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq-default
+ help-window-select t         ;; Focus new help window when opened
+ debug-on-error t
+ window-combination-resize t  ;; Resize window proportionally
+ history-delete-duplicates t)
 
 ;; hotkey for vc refresh state
 (global-set-key (kbd "C-x v 0") 'vc-refresh-state)
@@ -193,13 +233,6 @@
 (global-nlinum-mode -1)
 (add-hook 'text-mode-hook #'display-line-numbers-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
-
-;; helper to switch themes cleanly without mixing up color palletes
-(defun switch-theme ()
-  "An interactive function to switch themes."
-  (interactive)
-  (disable-theme (intern (car (mapcar #'symbol-name custom-enabled-themes))))
-  (call-interactively #'load-theme))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; javascript extra
@@ -508,21 +541,38 @@
                               (horizontal-scroll-bars . nil)
                               ;; (font . "InputMono-11")
                               ;; (font . "FiraCode-11")
-                              (font . "DejaVuSansMono-11")
+                              ;; (font . "DejaVuSansMono-11")
                               ))
   (menu-bar-mode -1)
 
+
+  ;; set font
+  (set-face-attribute 'default nil :font "Fira Code Retina" :height 110)
+  ;; fixed pitch face
+  (set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height 110)
+  ;; variable pitch face
+  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 120 :weight 'regular)
+
+;;; unicode fonts remap
+  (require 'unicode-fonts)
+  (setq unicode-fonts-skip-font-groups '(low-quality-gyphs))
+  (mapc
+   (lambda (block-name)
+     (let* ((old-font "Apple Color Emoji")
+            (new-font "Noto Color Emoji")
+            (block-idx (cl-position-if
+                        (lambda (i) (string-equal (car i) block-name))
+                        unicode-fonts-block-font-mapping))
+            (block-fonts (cadr (nth block-idx unicode-fonts-block-font-mapping)))
+            (updated-block (cl-substitute new-font old-font block-fonts :test 'string-equal)))
+       (setf (cdr (nth block-idx unicode-fonts-block-font-mapping))
+             `(,updated-block))))
+   '("Dingbats"
+     "Emoticons"
+     "Miscellaneous Symbols and Pictographs"
+     "Transport and Map Symbols"))
+  (unicode-fonts-setup)
+
   )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; unicode font support
-;; (lambda ()
-;;   ;; this is only meant for manual run just once if interested
-;;   ;; also you should ensure fonts are installed
-;;   (require 'list-utils)
-;;   (require 'unicode-fonts)
-;;   (unicode-fonts-setup)
-;;   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
