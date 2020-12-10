@@ -4,6 +4,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(setq gc-cons-threshold 100000000)
+
 ;; temp issue with https
 ;; (setq
 ;;  package-archives
@@ -24,7 +26,7 @@
 ;; install my packages
 (defvar my-packages
   '(org
-    org-bullets
+    org-superstar
     ob-http
     markdown-mode
     graphviz-dot-mode
@@ -33,6 +35,7 @@
 
     ivy
     ivy-rich
+    company-box
 
     paredit
     edn ;; needed for other clojure package
@@ -74,7 +77,7 @@
 ;; override prelude
 
 ;; disable flyspell
-(setq prelude-flyspell nil)
+;; (setq prelude-flyspell nil)
 
 ;; disable auto save of prelude
 (setq prelude-auto-save nil)
@@ -150,6 +153,27 @@
   (disable-theme (intern (car (mapcar #'symbol-name custom-enabled-themes))))
   (call-interactively #'load-theme))
 
+;; prettify things
+(global-prettify-symbols-mode 1)
+
+(defun add-pretty-lambda ()
+  "Make some word or string show as pretty Unicode symbols. See https://unicodelookup.com for more."
+  (setq prettify-symbols-alist
+        '(
+          ("lambda" . ?λ)
+          ("->" . ?⟶)
+          ("<=" . ?≤)
+          (">=" . ?≥)
+          ("#+BEGIN_SRC" . ?✎)
+          ("#+END_SRC"    . ?□)
+          ("#+BEGIN_EXAMPLE" . (?ℰ (Br . Bl) ?⇒)) ;; ℰ⇒
+          ("#+END_EXAMPLE"    . ?⇐)               ;; ⇐
+          ("#+BEGIN_QUOTE" . (?𝒬 (Br . Bl) ?⇒))   ;; 𝒬⇒
+          ("#+END_QUOTE"    . ?⇐)                 ;; ⇐
+          )))
+
+(add-hook 'org-mode-hook 'add-pretty-lambda)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -163,6 +187,10 @@
 (global-set-key (kbd "C-x v 0") 'vc-refresh-state)
 
 (global-set-key (kbd "C-x k") 'kill-current-buffer)
+
+;; company-box
+(require 'company-box)
+(add-hook 'company-mode-hook 'company-box-mode)
 
 ;; counsel
 (require 'counsel)
@@ -231,7 +259,7 @@
 (require 'nlinum)
 (setq nlinum-highlight-current-line t)
 (global-nlinum-mode -1)
-(add-hook 'text-mode-hook #'display-line-numbers-mode)
+;; (add-hook 'text-mode-hook #'display-line-numbers-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -303,13 +331,60 @@
 (setq plant-uml-jar-path (expand-file-name "~/sdk/plantuml.jar"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; org mode config
+;; org mode configuration
 
 (require 'org)
-(require 'org-bullets)
+(require 'org-superstar)
+(require 'org-indent)
 (require 'ob-http)
 
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+(setq org-ellipsis " ▾"
+      org-hide-emphasis-markers t
+      org-src-fontify-natively t
+      org-src-tab-acts-natively t
+      org-edit-src-content-indentation 0
+      org-hide-block-startup nil
+      org-src-preserve-indentation nil
+      org-startup-folded 'content
+      org-cycle-separator-lines 1
+      org-adapt-indentation nil
+      org-indent-indentation-per-level 2)
+
+(add-hook 'org-mode-hook
+          (lambda ()
+            (org-indent-mode)
+            (org-superstar-mode)
+            (variable-pitch-mode 1)
+            (auto-fill-mode 0)
+            (set-fill-column 100)
+            (whitespace-mode 0)
+            (visual-line-mode 1)))
+
+(setq org-superstar-remove-leading-stars t
+      org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●"))
+
+(dolist (face '((org-level-1 . 1.2)
+                (org-level-2 . 1.1)
+                (org-level-3 . 1.05)
+                (org-level-4 . 1.0)
+                (org-level-5 . 1.1)
+                (org-level-6 . 1.1)
+                (org-level-7 . 1.1)
+                (org-level-8 . 1.1)))
+  (set-face-attribute (car face) nil
+                      :font "Cantarell" :weight 'regular :height (cdr face)))
+
+;; Ensure that anything that should be fixed-pitch in Org files appears that way
+(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-special-keyword nil
+                    :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-superstar-item nil :inherit 'fixed-pitch)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -574,5 +649,9 @@
   (unicode-fonts-setup)
 
   )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq gc-cons-threshold 50000000)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

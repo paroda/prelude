@@ -1,4 +1,7 @@
-;;;;
+;;;; Code
+
+(setq gc-cons-threshold 100000000)
+
 ;; a bug fixed in 26.3, until then keep the below line
 (when (version< emacs-version "26.3")
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
