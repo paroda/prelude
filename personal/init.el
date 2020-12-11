@@ -48,6 +48,7 @@
 
     js2-refactor
     json-mode
+    lsp-java ;; assuming prelude lsp selected
 
     darkokai-theme
     doom-themes
@@ -60,6 +61,10 @@
     treemacs-projectile
     treemacs-icons-dired
     treemacs-magit
+    lsp-treemacs
+
+    yasnippet
+    yasnippet-snippets
 
     fish-mode
     eterm-256color
@@ -329,6 +334,34 @@
 (require 'plantuml-mode)
 (setq plantuml-server-url "http://www.plantuml.com/plantuml")
 (setq plant-uml-jar-path (expand-file-name "~/sdk/plantuml.jar"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; lsp java
+
+(define-key global-map "\C-cl" nil) ;; unbind "C-c l" before binding
+(setq lsp-keymap-prefix "C-c l"
+      lsp-enable-file-watchers nil
+      read-process-output-max (* 1024 1024)
+      lsp-completion-provider :capf
+      lsp-idle-delay 0.500
+      lsp-intelephense-multi-root nil)
+
+(require 'lsp-mode)
+(require 'prelude-lsp)
+(add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
+(add-hook 'java-mode-hook 'lsp-deferred)
+
+(require 'lsp-java)
+(add-hook 'java-mode-hook 'lsp)
+
+(require 'lsp-treemacs)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; yasnippet
+
+(require 'yasnippet)
+(require 'yasnippet-snippets)
+(yas-global-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org mode configuration
