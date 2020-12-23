@@ -183,6 +183,9 @@
  window-combination-resize t  ;; Resize window proportionally
  history-delete-duplicates t)
 
+;; dired hotkey
+(define-key dired-mode-map (kbd "r") 'dired-kill-subdir)
+
 ;; hotkey for vc refresh state
 (global-set-key (kbd "C-x v 0") 'vc-refresh-state)
 
