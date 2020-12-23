@@ -31,3 +31,7 @@ prelude-cheatsheet.log
 transient/
 /.org-id-locations
 /personal/flycheck_init.el
+/workspace/
+/eclipse.jdt.ls/
+/.lsp-session-v1
+/.dap-breakpoints
