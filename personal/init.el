@@ -339,7 +339,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; lsp java
 
-(define-key global-map "\C-cl" nil) ;; unbind "C-c l" before binding
+(define-key global-map "\C-c l" nil) ;; unbind "C-c l" before binding
 (setq lsp-keymap-prefix "C-c l"
       lsp-enable-file-watchers nil
       read-process-output-max (* 1024 1024)
