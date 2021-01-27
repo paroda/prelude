@@ -48,6 +48,7 @@
 
     js2-refactor
     json-mode
+    lsp-java ;; assuming prelude lsp selected
 
     darkokai-theme
     doom-themes
@@ -60,6 +61,10 @@
     treemacs-projectile
     treemacs-icons-dired
     treemacs-magit
+    lsp-treemacs
+
+    yasnippet
+    yasnippet-snippets
 
     fish-mode
     eterm-256color
@@ -239,9 +244,7 @@
 (progn
   (define-key hs-minor-mode-map (kbd "C-t") 'hs-toggle-hiding)
   (define-key hs-minor-mode-map (kbd "C-S-t") 'hs-hide-all))
-(dolist (m '(emacs-lisp-mode-hook
-             clojure-mode-hook clojurescript-mode-hook cider-mode-hook))
-  (add-hook m 'hs-minor-mode))
+(add-hook 'prog-mode-hook 'hs-minor-mode)
 
 ;; use paredit for clojure and elisp
 (require 'paredit)
@@ -332,6 +335,34 @@
 (require 'plantuml-mode)
 (setq plantuml-server-url "http://www.plantuml.com/plantuml")
 (setq plant-uml-jar-path (expand-file-name "~/sdk/plantuml.jar"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; lsp java
+
+(define-key global-map "\C-c l" nil) ;; unbind "C-c l" before binding
+(setq lsp-keymap-prefix "C-c l"
+      lsp-enable-file-watchers nil
+      read-process-output-max (* 1024 1024)
+      lsp-completion-provider :capf
+      lsp-idle-delay 0.500
+      lsp-intelephense-multi-root nil)
+
+(require 'lsp-mode)
+(require 'prelude-lsp)
+(add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
+(add-hook 'java-mode-hook 'lsp-deferred)
+
+(require 'lsp-java)
+(add-hook 'java-mode-hook 'lsp)
+
+(require 'lsp-treemacs)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; yasnippet
+
+(require 'yasnippet)
+(require 'yasnippet-snippets)
+(yas-global-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org mode configuration
@@ -499,37 +530,45 @@
 (progn
   (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
         treemacs-deferred-git-apply-delay      0.5
+        treemacs-directory-name-transformer    #'identity
         treemacs-display-in-side-window        t
         treemacs-eldoc-display                 t
         treemacs-file-event-delay              1000 ; 5000
+        treemacs-file-extension-regex          treemacs-last-period-regex-value
         treemacs-file-follow-delay             0.2
+        treemacs-file-name-transformer         #'identity
         treemacs-follow-after-init             t
         treemacs-git-command-pipe              ""
         treemacs-goto-tag-strategy             'refetch-index
         treemacs-indentation                   2
         treemacs-indentation-string            " "
-        treemacs-is-never-other-window         t
+        treemacs-is-never-other-window         t ; nil
         treemacs-max-git-entries               5000
         treemacs-missing-project-action        'ask
+        treemacs-move-forward-on-expand        nil
         treemacs-no-png-images                 nil
         treemacs-no-delete-other-windows       t
         treemacs-project-follow-cleanup        nil
         treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
         treemacs-position                      'left
+        treemacs-read-string-input             'from-minibuffer ; 'from-child-frame
         treemacs-recenter-distance             0.1
         treemacs-recenter-after-file-follow    nil
         treemacs-recenter-after-tag-follow     nil
         treemacs-recenter-after-project-jump   'always
         treemacs-recenter-after-project-expand 'on-distance
         treemacs-show-cursor                   nil
-        treemacs-show-hidden-files             nil
+        treemacs-show-hidden-files             nil ; t
         treemacs-silent-filewatch              nil
         treemacs-silent-refresh                nil
         treemacs-sorting                       'alphabetic-asc
         treemacs-space-between-root-nodes      t
         treemacs-tag-follow-cleanup            t
         treemacs-tag-follow-delay              1.5
-        treemacs-width                         35)
+        treemacs-user-mode-line-format         nil
+        treemacs-user-header-line-format       nil
+        treemacs-width                         35
+        treemacs-workspace-switch-cleanup      nil)
 
   ;; The default width and height of the icons is 22 pixels. If you are
   ;; using a Hi-DPI display, uncomment this to double the icon size.
