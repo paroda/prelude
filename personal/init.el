@@ -630,7 +630,7 @@
             (lambda ()
               (vterm-minor-mode 1)
               (set (make-local-variable 'buffer-face-mode-face)
-                   '(:family "FiraMono" :height 110))
+                   '(:family "Fira Code Nerd Font Mono" :height 110))
               (buffer-face-mode t)))
   (define-key vterm-copy-mode-map (kbd "C-a") 'vterm-beginning-of-line)
   (define-key vterm-copy-mode-map (kbd "C-e") 'vterm-end-of-line)
@@ -664,13 +664,13 @@
 
 
   ;; set font
-  (set-face-attribute 'default nil :font "Fira Code Retina" :height 110)
+  (set-face-attribute 'default nil :font "Fira Code Nerd Font" :height 110)
   ;; fixed pitch face
-  (set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height 110)
+  (set-face-attribute 'fixed-pitch nil :font "Fira Code Nerd Font" :height 110)
   ;; variable pitch face
   (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 120 :weight 'regular)
 
-;;; unicode fonts remap
+  ;; unicode fonts remap
   (require 'unicode-fonts)
   (setq unicode-fonts-skip-font-groups '(low-quality-gyphs))
   (mapc
