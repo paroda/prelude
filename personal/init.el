@@ -58,6 +58,7 @@
     unicode-fonts
 
     treemacs
+    treemacs-all-the-icons
     treemacs-projectile
     treemacs-icons-dired
     treemacs-magit
@@ -523,9 +524,12 @@
 ;; treemacs setup
 
 (require 'treemacs)
+(require 'treemacs-all-the-icons)
 (require 'treemacs-projectile)
 (require 'treemacs-magit)
 (require 'treemacs-perspective)
+
+(treemacs-load-theme "all-the-icons")
 
 (progn
   (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
