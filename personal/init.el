@@ -134,8 +134,8 @@
 (doom-themes-visual-bell-config)
 
 ;; enable custom treemacs theme
-(setq doom-themes-treemacs-theme "doom-colors")
-(doom-themes-treemacs-config)
+;; (setq doom-themes-treemacs-theme "doom-colors")
+;; (doom-themes-treemacs-config)
 
 ;; fix and improve org mode native fontification
 (doom-themes-org-config)
