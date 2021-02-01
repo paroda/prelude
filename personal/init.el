@@ -32,6 +32,7 @@
     graphviz-dot-mode
     plantuml-mode
     gnuplot
+    pandoc-mode
 
     ivy
     ivy-rich
@@ -461,6 +462,12 @@
 (setq org-latex-packages-alist '(("margin=2cm" "geometry" nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; pandoc
+(require 'pandoc-mode)
+(add-hook 'markdown-mode-hook 'pandoc-mode)
+(add-hook 'pandoc-mode-hook 'pandoc-load-default-settings)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TRAMP
 (customize-set-variable
  'tramp-ssh-controlmaster-options
@@ -628,6 +635,7 @@
   (setq vterm-buffer-name-string "vterm:%s")
   (setq vterm-kill-buffer-on-exit t)
   (setq vterm-copy-exclude-prompt t)
+  (set-face-attribute 'vterm-color-green nil :foreground "#009900")
 
   (add-hook 'vterm-mode-hook
             (lambda ()
