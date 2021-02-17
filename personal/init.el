@@ -200,6 +200,8 @@
 ;; company-box
 (require 'company-box)
 (add-hook 'company-mode-hook 'company-box-mode)
+(setf (alist-get 'left-fringe company-box-frame-parameters) 10)
+(setf (alist-get 'right-fringe company-box-frame-parameters) 10)
 
 ;; counsel
 (require 'counsel)
@@ -278,6 +280,16 @@
 
 (require 'json-mode)
 (add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
+
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+
+(flycheck-add-mode 'javascript-eslint 'web-mode)
+
+(setq-default flycheck-disabled-checkers
+              (append flycheck-disabled-checkers
+                      '(javascript-jshint
+                        json-jsonlint)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Clojure extra
