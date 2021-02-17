@@ -9,6 +9,9 @@
 ;; disable prelude-theme
 (setq prelude-theme nil)
 
+;; minimalistic ui, like no line numbers globally by default
+(setq prelude-minimalistic-ui t)
+
 ;; prefer utf-8
 (set-charset-priority 'unicode)
 (set-default-coding-systems 'utf-8)
