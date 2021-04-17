@@ -91,6 +91,38 @@
 ;; Optionally add the `consult-flycheck' command
 (define-key flycheck-command-map (kbd "!") #'consult-flycheck)
 
+
+;;;; use marginalia
+(require 'marginalia)
+(global-set-key (kbd "M-A") 'marginalia-cycle)
+(define-key minibuffer-local-map (kbd "M-A") 'marginalia-cycle)
+(marginalia-mode 1)
+
+;; Prefer richer, more heavy, annotations over the lighter default variant.
+;; E.g. M-x will show the documentation string additional to the keybinding.
+;; By default only the keybinding is shown as annotation.
+;; Note that there is the command `marginalia-cycle' to
+;; switch between the annotators.
+(setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+
+;;;; use embark-consult
+(require 'embark)
+
+(global-set-key (kbd "C-S-a") 'embark-act)
+(global-set-key (kbd "C-h B") 'embark-bindings) ;; alternative for `describe-bindings'
+
+;; Optionally replace the key help with a completing-read interface
+(setq prefix-help-command #'embark-prefix-help-command)
+
+;; Hide the mode line of the Embark live/completion buffers
+(add-to-list 'display-buffer-alist
+             '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+               nil
+               (window-parameters (mode-line-format . none))))
+
+(require 'embark-consult)
+(add-hook 'embark-collect-mode #'embark-consult-preview-minor-mode)
+
 ;;;
 
 (provide 'consult-selectrum-config)

@@ -37,6 +37,8 @@
     selectrum
     consult
     consult-flycheck
+    marginalia
+    embark-consult
     company-box
 
     paredit
