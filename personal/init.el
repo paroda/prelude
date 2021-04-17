@@ -34,8 +34,9 @@
     gnuplot
     pandoc-mode
 
-    ivy
-    ivy-rich
+    selectrum
+    consult
+    consult-flycheck
     company-box
 
     paredit
@@ -49,7 +50,6 @@
 
     js2-refactor
     json-mode
-    lsp-java ;; assuming prelude lsp selected
 
     darkokai-theme
     doom-themes
@@ -62,7 +62,6 @@
     treemacs-projectile
     treemacs-icons-dired
     treemacs-magit
-    lsp-treemacs
 
     yasnippet
     yasnippet-snippets
@@ -71,7 +70,6 @@
     eterm-256color
     magit-gitflow
     perspective
-    counsel-projectile
     ripgrep
     persistent-scratch))
 
@@ -90,32 +88,6 @@
 (super-save-mode -1)
 (setq super-save-remote-files nil)
 
-;; customize ivy over prelude defaults
-(require 'ivy)
-(setq ivy-count-format "%d/%d ")
-(setq ivy-sort-matches-functions-alist '((t . nil)))
-;; (setq ivy-initial-inputs-alist nil) ;; uncomment it to remove "^" form search
-
-;; set minibuffer height for different commands
-(setf (alist-get 'counsel-projectile-ag ivy-height-alist) 15)
-(setf (alist-get 'counsel-projectile-rg ivy-height-alist) 15)
-(setf (alist-get 'swiper ivy-height-alist) 15)
-(setf (alist-get 'counsel-switch-buffer ivy-height-alist) 7)
-
-(require 'ivy-rich)
-(setq ivy-format-function #'ivy-format-function-line)
-(setq ivy-rich-display-transformers-list
-      (plist-put ivy-rich-display-transformers-list
-                 'ivy-switch-buffer
-                 '(:columns
-                   ((ivy-rich-candidate (:width 40))
-                    (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
-                    (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
-                    (ivy-rich-switch-buffer-project (:width 15 :face success))
-                    (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
-                   :predicate (lambda (cand) t))))
-(ivy-rich-mode 1)
-
 ;;;;;;;;;;; doom theme ;;;;;;;;;;;;
 
 (require 'doom-themes)
@@ -133,10 +105,6 @@
 
 ;; enable flashing mode-line on errors
 (doom-themes-visual-bell-config)
-
-;; enable custom treemacs theme
-;; (setq doom-themes-treemacs-theme "doom-colors")
-;; (doom-themes-treemacs-config)
 
 ;; fix and improve org mode native fontification
 (doom-themes-org-config)
@@ -197,16 +165,13 @@
 
 (global-set-key (kbd "C-x k") 'kill-current-buffer)
 
+;; selectrum
+(require 'consult-selectrum-config)
+(global-set-key (kbd "C-x C-z") #'selectrum-repeat)
+
 ;; company-box
 (require 'company-box)
 (add-hook 'company-mode-hook 'company-box-mode)
-
-;; counsel
-(require 'counsel)
-(require 'counsel-projectile)
-(counsel-projectile-mode)
-(global-set-key (kbd "C-z s a") 'counsel-ag)
-(global-set-key (kbd "C-z s r") 'counsel-rg)
 
 ;; So Long mitigates slowness due to extremely long lines.
 ;; Currently available in Emacs master branch *only*!
@@ -336,27 +301,6 @@
 (require 'plantuml-mode)
 (setq plantuml-server-url "http://www.plantuml.com/plantuml")
 (setq plant-uml-jar-path (expand-file-name "~/sdk/plantuml.jar"))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; lsp java
-
-(define-key global-map "\C-c l" nil) ;; unbind "C-c l" before binding
-(setq lsp-keymap-prefix "C-c l"
-      lsp-enable-file-watchers nil
-      read-process-output-max (* 1024 1024)
-      lsp-completion-provider :capf
-      lsp-idle-delay 0.500
-      lsp-intelephense-multi-root nil)
-
-(require 'lsp-mode)
-(require 'prelude-lsp)
-(add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
-(add-hook 'java-mode-hook 'lsp-deferred)
-
-(require 'lsp-java)
-(add-hook 'java-mode-hook 'lsp)
-
-(require 'lsp-treemacs)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; yasnippet
@@ -516,8 +460,6 @@
 
 (require 'perspective)
 (persp-mode)
-(global-set-key (kbd "C-x b") 'persp-ivy-switch-buffer)
-(global-set-key (kbd "C-x B") 'persp-counsel-switch-buffer)
 (global-set-key (kbd "C-x K") 'persp-kill-buffer*)
 (global-set-key (kbd "C-x C-b") 'persp-ibuffer)
 (setq frame-title-format
@@ -682,24 +624,24 @@
   (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 120 :weight 'regular)
 
   ;; unicode fonts remap
-  (require 'unicode-fonts)
-  (setq unicode-fonts-skip-font-groups '(low-quality-gyphs))
-  (mapc
-   (lambda (block-name)
-     (let* ((old-font "Apple Color Emoji")
-            (new-font "Noto Color Emoji")
-            (block-idx (cl-position-if
-                        (lambda (i) (string-equal (car i) block-name))
-                        unicode-fonts-block-font-mapping))
-            (block-fonts (cadr (nth block-idx unicode-fonts-block-font-mapping)))
-            (updated-block (cl-substitute new-font old-font block-fonts :test 'string-equal)))
-       (setf (cdr (nth block-idx unicode-fonts-block-font-mapping))
-             `(,updated-block))))
-   '("Dingbats"
-     "Emoticons"
-     "Miscellaneous Symbols and Pictographs"
-     "Transport and Map Symbols"))
-  (unicode-fonts-setup)
+  ;;  (require 'unicode-fonts)
+  ;;  (setq unicode-fonts-skip-font-groups '(low-quality-gyphs))
+  ;;  (mapc
+  ;;   (lambda (block-name)
+  ;;     (let* ((old-font "Apple Color Emoji")
+  ;;            (new-font "Noto Color Emoji")
+  ;;            (block-idx (cl-position-if
+  ;;                        (lambda (i) (string-equal (car i) block-name))
+  ;;                        unicode-fonts-block-font-mapping))
+  ;;            (block-fonts (cadr (nth block-idx unicode-fonts-block-font-mapping)))
+  ;;            (updated-block (cl-substitute new-font old-font block-fonts :test 'string-equal)))
+  ;;       (setf (cdr (nth block-idx unicode-fonts-block-font-mapping))
+  ;;             `(,updated-block))))
+  ;;   '("Dingbats"
+  ;;     "Emoticons"
+  ;;     "Miscellaneous Symbols and Pictographs"
+  ;;     "Transport and Map Symbols"))
+  ;;  (unicode-fonts-setup)
 
   )
 
