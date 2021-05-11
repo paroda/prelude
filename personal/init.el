@@ -47,7 +47,6 @@
     clojure-mode-extra-font-locking
     flycheck
     flycheck-pos-tip
-    flycheck-joker
     flycheck-clj-kondo
 
     js2-refactor
@@ -158,6 +157,9 @@
  debug-on-error t
  window-combination-resize t  ;; Resize window proportionally
  history-delete-duplicates t)
+
+;; dired - sort by grouping directories first
+(setq dired-listing-switches "-al --group-directories-first")
 
 ;; dired hotkey
 (define-key dired-mode-map (kbd "r") 'dired-kill-subdir)
@@ -281,17 +283,10 @@
 ;; setup flycheck linters
 (require 'flycheck)
 (require 'flycheck-pos-tip)
-(require 'flycheck-joker)
 (require 'flycheck-clj-kondo)
 
 (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
   (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
-
-(dolist (checkers '((clj-kondo-clj . clojure-joker)
-                    (clj-kondo-cljs . clojurescript-joker)
-                    (clj-kondo-cljc . clojure-joker)
-                    (clj-kondo-edn . edn-joker)))
-  (flycheck-add-next-checker (car checkers) (cons 'error (cdr checkers))))
 
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode)
@@ -638,24 +633,24 @@
   (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 120 :weight 'regular)
 
   ;; unicode fonts remap
-  ;;  (require 'unicode-fonts)
-  ;;  (setq unicode-fonts-skip-font-groups '(low-quality-gyphs))
-  ;;  (mapc
-  ;;   (lambda (block-name)
-  ;;     (let* ((old-font "Apple Color Emoji")
-  ;;            (new-font "Noto Color Emoji")
-  ;;            (block-idx (cl-position-if
-  ;;                        (lambda (i) (string-equal (car i) block-name))
-  ;;                        unicode-fonts-block-font-mapping))
-  ;;            (block-fonts (cadr (nth block-idx unicode-fonts-block-font-mapping)))
-  ;;            (updated-block (cl-substitute new-font old-font block-fonts :test 'string-equal)))
-  ;;       (setf (cdr (nth block-idx unicode-fonts-block-font-mapping))
-  ;;             `(,updated-block))))
-  ;;   '("Dingbats"
-  ;;     "Emoticons"
-  ;;     "Miscellaneous Symbols and Pictographs"
-  ;;     "Transport and Map Symbols"))
-  ;;  (unicode-fonts-setup)
+  (require 'unicode-fonts)
+  (setq unicode-fonts-skip-font-groups '(low-quality-gyphs))
+  (mapc
+   (lambda (block-name)
+     (let* ((old-font "Apple Color Emoji")
+            (new-font "Noto Color Emoji")
+            (block-idx (cl-position-if
+                        (lambda (i) (string-equal (car i) block-name))
+                        unicode-fonts-block-font-mapping))
+            (block-fonts (cadr (nth block-idx unicode-fonts-block-font-mapping)))
+            (updated-block (cl-substitute new-font old-font block-fonts :test 'string-equal)))
+       (setf (cdr (nth block-idx unicode-fonts-block-font-mapping))
+             `(,updated-block))))
+   '("Dingbats"
+     "Emoticons"
+     "Miscellaneous Symbols and Pictographs"
+     "Transport and Map Symbols"))
+  (unicode-fonts-setup)
 
   )
 
