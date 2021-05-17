@@ -89,6 +89,9 @@
 (super-save-mode -1)
 (setq super-save-remote-files nil)
 
+(set-default 'tab-width 4)
+(setq tab-width 4)
+
 ;;;;;;;;;;; doom theme ;;;;;;;;;;;;
 
 (require 'doom-themes)
