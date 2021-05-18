@@ -204,6 +204,10 @@
 
 ;; keep scratch buffer on restart
 (require 'persistent-scratch)
+(setq persistent-scratch-save-file "~/.emacs.d/.persistent/scratch")
+(defun my-persistent-scratch-default-scratch-buffer-p ()
+  (string-match-p "^\\*scratch\\*\\( (.+)\\)?$" (buffer-name)))
+(setq persistent-scratch-scratch-buffer-p-function 'my-persistent-scratch-default-scratch-buffer-p)
 (persistent-scratch-setup-default)
 
 ;; enable git flow
@@ -621,7 +625,7 @@
                               ;; (top . 50)
                               ;; (width . 90)  ; chars
                               ;; (height . 30) ; lines
-                              (alpha . (90 . 50))
+                              (alpha . (95 . 85))
                               (vertical-scroll-bars . nil)
                               (horizontal-scroll-bars . nil)
                               ;; (font . "InputMono-11")
