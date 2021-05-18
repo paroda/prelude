@@ -312,7 +312,7 @@
 
 (require 'plantuml-mode)
 (setq plantuml-server-url "http://www.plantuml.com/plantuml")
-(setq plant-uml-jar-path (expand-file-name "~/sdk/plantuml.jar"))
+(setq plant-uml-jar-path (expand-file-name "~/.sdk/plantuml.jar"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; yasnippet
@@ -398,7 +398,7 @@
 (org-defkey org-mode-map "\C-x\C-d" 'cider-doc)
 
 (setq org-ditaa-jar-path "/usr/share/ditaa/ditaa.jar")
-(setq org-plantuml-jar-path (expand-file-name "~/sdk/plantuml.jar"))
+(setq org-plantuml-jar-path plant-uml-jar-path)
 (setq org-confirm-babel-evaluate nil)
 (setq org-babel-results-keyword "results") ;; make label lowercase
 
