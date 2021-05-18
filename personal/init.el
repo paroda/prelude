@@ -92,6 +92,8 @@
 (set-default 'tab-width 4)
 (setq tab-width 4)
 
+(setq whitespace-line-column 100)
+
 ;;;;;;;;;;; doom theme ;;;;;;;;;;;;
 
 (require 'doom-themes)
@@ -619,6 +621,7 @@
                               ;; (top . 50)
                               ;; (width . 90)  ; chars
                               ;; (height . 30) ; lines
+                              (alpha . (90 . 50))
                               (vertical-scroll-bars . nil)
                               (horizontal-scroll-bars . nil)
                               ;; (font . "InputMono-11")
