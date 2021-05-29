@@ -34,6 +34,9 @@
     gnuplot
     pandoc-mode
 
+    ivy     ;; ivy & counsel only for buffer switching with perspective
+    counsel ;;
+
     selectrum
     consult
     consult-flycheck
@@ -476,8 +479,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; perspective
 
+(require 'counsel)
 (require 'perspective)
 (persp-mode)
+(global-set-key (kbd "C-x b") 'persp-counsel-switch-buffer)
 (global-set-key (kbd "C-x K") 'persp-kill-buffer*)
 (global-set-key (kbd "C-x C-b") 'persp-ibuffer)
 (setq frame-title-format
@@ -601,7 +606,7 @@
             (lambda ()
               (vterm-minor-mode 1)
               (set (make-local-variable 'buffer-face-mode-face)
-                   '(:family "Fira Code Nerd Font Mono" :height 110))
+                   '(:family "Fira Code Nerd Font Mono" :height 120))
               (buffer-face-mode t)))
   (define-key vterm-copy-mode-map (kbd "C-a") 'vterm-beginning-of-line)
   (define-key vterm-copy-mode-map (kbd "C-e") 'vterm-end-of-line)
@@ -636,11 +641,11 @@
 
 
   ;; set font
-  (set-face-attribute 'default nil :font "Fira Code Nerd Font" :height 110)
+  (set-face-attribute 'default nil :font "Fira Code Nerd Font" :height 120)
   ;; fixed pitch face
-  (set-face-attribute 'fixed-pitch nil :font "Fira Code Nerd Font" :height 110)
+  (set-face-attribute 'fixed-pitch nil :font "Fira Code Nerd Font" :height 120)
   ;; variable pitch face
-  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 120 :weight 'regular)
+  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)
 
   ;; unicode fonts remap
   (require 'unicode-fonts)
