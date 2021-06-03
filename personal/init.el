@@ -34,17 +34,15 @@
     gnuplot
     pandoc-mode
 
-    ivy     ;; ivy & counsel only for buffer switching with perspective
-    counsel ;;
-
     selectrum
     consult
     consult-flycheck
     marginalia
     embark-consult
     company-box
+    ibuffer-projectile
 
-    paredit
+    ;; paredit
     edn ;; needed for other clojure package
     cider
     clojure-mode-extra-font-locking
@@ -73,7 +71,6 @@
     fish-mode
     eterm-256color
     magit-gitflow
-    perspective
     ripgrep
     persistent-scratch))
 
@@ -107,10 +104,6 @@
 ;; highlight matching parentheses or braces when cusror is on one
 (set-face-attribute 'sp-show-pair-match-face nil
                     :foreground "white" :background "#2257A0")
-
-;; popups
-(set-face-attribute 'tooltip nil :background "#334455")
-(set-face-attribute 'company-tooltip nil :background "#283644")
 
 ;; enable flashing mode-line on errors
 (doom-themes-visual-bell-config)
@@ -148,11 +141,17 @@
           ("<=" . ?≤)
           (">=" . ?≥)
           ("#+BEGIN_SRC" . ?✎)
+          ("#+begin_src" . ?✎)
           ("#+END_SRC"    . ?□)
+          ("#+end_src"    . ?□)
           ("#+BEGIN_EXAMPLE" . (?ℰ (Br . Bl) ?⇒)) ;; ℰ⇒
+          ("#+begin_example" . (?ℰ (Br . Bl) ?⇒)) ;; ℰ⇒
           ("#+END_EXAMPLE"    . ?⇐)               ;; ⇐
+          ("#+end_example"    . ?⇐)               ;; ⇐
           ("#+BEGIN_QUOTE" . (?𝒬 (Br . Bl) ?⇒))   ;; 𝒬⇒
+          ("#+begin_quote" . (?𝒬 (Br . Bl) ?⇒))   ;; 𝒬⇒
           ("#+END_QUOTE"    . ?⇐)                 ;; ⇐
+          ("#+end_quote"    . ?⇐)                 ;; ⇐
           )))
 
 (add-hook 'org-mode-hook 'add-pretty-lambda)
@@ -172,20 +171,13 @@
 ;; dired hotkey
 (define-key dired-mode-map (kbd "r") 'dired-kill-subdir)
 
+;; editing hotkey
+(global-set-key (kbd "M-O") 'crux-smart-open-line-above)
+
 ;; hotkey for vc refresh state
 (global-set-key (kbd "C-x v 0") 'vc-refresh-state)
 
 (global-set-key (kbd "C-x k") 'kill-current-buffer)
-
-;; selectrum
-(require 'consult-selectrum-config)
-(global-set-key (kbd "C-x C-z") #'selectrum-repeat)
-
-;; company-box
-(require 'company-box)
-(add-hook 'company-mode-hook 'company-box-mode)
-(setf (alist-get 'left-fringe company-box-frame-parameters) 10)
-(setf (alist-get 'right-fringe company-box-frame-parameters) 10)
 
 ;; So Long mitigates slowness due to extremely long lines.
 ;; Currently available in Emacs master branch *only*!
@@ -201,10 +193,71 @@
 ;; enable auto root mode open
 (crux-reopen-as-root-mode)
 
-(require 'smartparens)
-(smartparens-global-mode)
-(smartparens-global-strict-mode)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; selectrum
+(require 'prelude-selectrum)
+(require 'consult-selectrum-config)
+(global-set-key (kbd "C-x C-z") #'selectrum-repeat)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; company
+(require 'prelude-company)
+(require 'company-box)
+(add-hook 'company-mode-hook 'company-box-mode)
+(setf (alist-get 'left-fringe company-box-frame-parameters) 10)
+(setf (alist-get 'right-fringe company-box-frame-parameters) 10)
+
+;; popups
+(set-face-attribute 'tooltip nil :background "#334455")
+(set-face-attribute 'company-tooltip nil :background "#283644")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; enable ibuffer grouping as vcs
+(require 'ibuffer-projectile)
+(add-hook 'ibuffer-hook
+          (lambda ()
+            (ibuffer-projectile-set-filter-groups)
+            (unless (eq ibuffer-sorting-mode 'alphabetic)
+              (ibuffer-do-sort-by-alphabetic))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; consult - extras
+(defun consult-fd (&optional dir initial) ;; NOTE: require fd be installed
+  (interactive "P")
+  (let ((consult-find-command "fd --color=never --full-path ARG OPTS"))
+    (consult-find dir initial)))
+(global-set-key (kbd "C-c c F") 'consult-fd)
+
+(defvar-local consult-toggle-preview-orig nil)
+(defun consult-toggle-preview ()
+  "Command to enable/disable preview."
+  (interactive)
+  (if consult-toggle-preview-orig
+      (setq consult--preview-function consult-toggle-preview-orig
+            consult-toggle-preview-orig nil)
+    (setq consult-toggle-preview-orig consult--preview-function
+          consult--preview-function #'ignore)))
+(define-key selectrum-minibuffer-map (kbd "M-P") #'consult-toggle-preview)
+
+(setq consult-locate-command "plocate -i -r ARG OPTS") ;; NOTE: requires plocate be installed
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(progn
+  ;; set arrow keys in isearch
+  ;; left/right is backward/forward
+  ;; up/down is history
+  ;; press Return to exit
+  (define-key isearch-mode-map (kbd "<up>") 'isearch-ring-retreat)
+  (define-key isearch-mode-map (kbd "<down>") 'isearch-ring-advance)
+  (define-key isearch-mode-map (kbd "<left>") 'isearch-repeat-backward)
+  (define-key isearch-mode-map (kbd "<right>") 'isearch-repeat-forward)
+  (define-key minibuffer-local-isearch-map (kbd "<left>")
+    'isearch-reverse-exit-minibuffer)
+  (define-key minibuffer-local-isearch-map (kbd "<right>")
+    'isearch-forward-exit-minibuffer))
+(global-set-key (kbd "C-S-s") 'isearch-forward-symbol-at-point)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; keep scratch buffer on restart
 (require 'persistent-scratch)
 (setq persistent-scratch-save-file "~/.emacs.d/.persistent/scratch")
@@ -213,29 +266,25 @@
 (setq persistent-scratch-scratch-buffer-p-function 'my-persistent-scratch-default-scratch-buffer-p)
 (persistent-scratch-setup-default)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; enable git flow
 (require 'magit-gitflow)
 (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Syntax highlighting
 (require 'highlight-symbol)
 (require 'flyspell)
 (global-set-key (kbd "C-.") 'highlight-symbol-at-point)
 (define-key flyspell-mode-map (kbd "C-.") nil)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; hideshow setup
 (require 'hideshow)
 (progn
   (define-key hs-minor-mode-map (kbd "C-t") 'hs-toggle-hiding)
   (define-key hs-minor-mode-map (kbd "C-S-t") 'hs-hide-all))
 (add-hook 'prog-mode-hook 'hs-minor-mode)
-
-;; use paredit for clojure and elisp
-(require 'paredit)
-(require 'cider)
-(dolist (m '(emacs-lisp-mode-hook
-             clojure-mode-hook clojurescript-mode-hook cider-repl-mode-hook))
-  (add-hook m 'paredit-mode))
 
 ;; configure comment tool
 (defun toggle-comment-on-line ()
@@ -253,7 +302,18 @@
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; javascript extra
+;; extra prelude modules
+(require 'prelude-shell)
+(require 'prelude-xml)
+(require 'prelude-yaml)
+(require 'prelude-emacs-lisp)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; web (html/css/js)
+
+(require 'prelude-web)
+(require 'prelude-css)
+(require 'prelude-js)
 
 (require 'js2-refactor)
 (add-hook 'js2-mode-hook #'js2-refactor-mode)
@@ -275,14 +335,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Clojure extra
 
-;; A little more syntax highlighting
-(require 'clojure-mode-extra-font-locking)
-
-;; enable pretty lambda (replace fn keyword with greek letter)
-(require 'clojure-pretty-lambda)
-(dolist (m '(clojure-mode-hook clojurescript-mode-hook cider-repl-mode-hook))
-  (add-hook m 'clojure-pretty-lambda-mode))
-
+(require 'prelude-clojure)
 (require 'cider)
 ;; enable cider repl pprint using fipp
 (setq cider-print-fn 'fipp)
@@ -310,6 +363,14 @@
           (lambda ()
             (setq next-error-function #'flycheck-next-error-function)))
 
+;; A little more syntax highlighting
+(require 'clojure-mode-extra-font-locking)
+
+;; enable pretty lambda (replace fn keyword with greek letter)
+(require 'clojure-pretty-lambda)
+(dolist (m '(clojure-mode-hook clojurescript-mode-hook cider-repl-mode-hook))
+  (add-hook m 'clojure-pretty-lambda-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; graphviz
 
@@ -333,6 +394,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org mode configuration
 
+(require 'prelude-org)
 (require 'org)
 (require 'org-superstar)
 (require 'org-indent)
@@ -385,6 +447,12 @@
 (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
 (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
 (set-face-attribute 'org-superstar-item nil :inherit 'fixed-pitch)
+
+;; setup node modules load path for org babel node
+(setenv "NODE_PATH"
+        (concat "./node_modules:"
+                (getenv "HOME") "/my/org/node_modules:"
+                (getenv "NODE_PATH")))
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -461,43 +529,11 @@
     (kill-new hash)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(progn
-  ;; set arrow keys in isearch
-  ;; left/right is backward/forward
-  ;; up/down is history
-  ;; press Return to exit
-  (define-key isearch-mode-map (kbd "<up>") 'isearch-ring-retreat)
-  (define-key isearch-mode-map (kbd "<down>") 'isearch-ring-advance)
-  (define-key isearch-mode-map (kbd "<left>") 'isearch-repeat-backward)
-  (define-key isearch-mode-map (kbd "<right>") 'isearch-repeat-forward)
-  (define-key minibuffer-local-isearch-map (kbd "<left>")
-    'isearch-reverse-exit-minibuffer)
-  (define-key minibuffer-local-isearch-map (kbd "<right>")
-    'isearch-forward-exit-minibuffer))
-(global-set-key (kbd "C-S-s") 'isearch-forward-symbol-at-point)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; perspective
-
-(require 'counsel)
-(require 'perspective)
-(persp-mode)
-(global-set-key (kbd "C-x b") 'persp-counsel-switch-buffer)
-(global-set-key (kbd "C-x K") 'persp-kill-buffer*)
-(global-set-key (kbd "C-x C-b") 'persp-ibuffer)
-(setq frame-title-format
-      '(""
-        (:eval (or (persp-current-name) "Prelude"))
-        " - "
-        (:eval (if (buffer-file-name) (abbreviate-file-name (buffer-file-name)) "%b"))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; treemacs setup
 
 (require 'treemacs)
 (require 'treemacs-projectile)
 (require 'treemacs-magit)
-(require 'treemacs-perspective)
 
 (require 'my-treemacs-all-the-icons)
 (treemacs-load-theme "my-all-the-icons")
@@ -569,6 +605,7 @@
   (define-key treemacs-mode-map [mouse-1] 'treemacs-single-click-expand-action))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; vterm setup
 
 (require 'eterm-256color)
 (add-hook 'term-mode-hook #'eterm-256color-mode)
@@ -630,7 +667,7 @@
                               ;; (top . 50)
                               ;; (width . 90)  ; chars
                               ;; (height . 30) ; lines
-                              (alpha . (95 . 85))
+                              (alpha . (90 . 75))
                               (vertical-scroll-bars . nil)
                               (horizontal-scroll-bars . nil)
                               ;; (font . "InputMono-11")
