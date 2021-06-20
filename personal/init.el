@@ -4,7 +4,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq gc-cons-threshold 100000000)
+(setq gc-cons-threshold (* 100 1024 1024))
 
 ;; temp issue with https
 ;; (setq
@@ -42,7 +42,6 @@
     company-box
     ibuffer-projectile
 
-    ;; paredit
     edn ;; needed for other clojure package
     cider
     clojure-mode-extra-font-locking
@@ -53,12 +52,11 @@
     js2-refactor
     json-mode
 
-    darkokai-theme
     doom-themes
     doom-modeline
     highlight-symbol
     all-the-icons
-    unicode-fonts
+    ;; unicode-fonts
 
     treemacs
     treemacs-projectile
@@ -68,8 +66,6 @@
     yasnippet
     yasnippet-snippets
 
-    fish-mode
-    eterm-256color
     magit-gitflow
     ripgrep
     persistent-scratch))
@@ -89,8 +85,7 @@
 (super-save-mode -1)
 (setq super-save-remote-files nil)
 
-(set-default 'tab-width 4)
-(setq tab-width 4)
+(setq-default tab-width 4)
 
 (setq whitespace-line-column 100)
 
@@ -162,6 +157,7 @@
 (setq-default
  help-window-select t         ;; Focus new help window when opened
  debug-on-error t
+ jit-lock-defer-time 0
  window-combination-resize t  ;; Resize window proportionally
  history-delete-duplicates t)
 
@@ -192,6 +188,10 @@
 
 ;; enable auto root mode open
 (crux-reopen-as-root-mode)
+
+;; repurpose C-_ for contract region to complement C-= for expand region
+(define-key undo-tree-map (kbd "C-_") nil)
+(global-set-key (kbd "C-_") 'er/contract-region)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; selectrum
@@ -607,9 +607,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; vterm setup
 
-(require 'eterm-256color)
-(add-hook 'term-mode-hook #'eterm-256color-mode)
-
 (defvar vterm-minor-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-a") 'vterm-send-C-a)
@@ -631,13 +628,12 @@
   ;; * you need to manually install vterm and fish and configure them.
   ;;   this will not auto install them. it only adds some settings,
   ;;   which are ignored in the absence of required components.
-  (setq vterm-term-environment-variable "eterm-256color")
+  (setq vterm-term-environment-variable "xterm-256color")
   (setq vterm-shell (or (executable-find "fish")
                         (executable-find "bash")))
   (setq vterm-buffer-name-string "vterm:%s")
   (setq vterm-kill-buffer-on-exit t)
   (setq vterm-copy-exclude-prompt t)
-  (set-face-attribute 'vterm-color-green nil :foreground "#009900")
 
   (add-hook 'vterm-mode-hook
             (lambda ()
@@ -660,54 +656,45 @@
   (treemacs-icons-dired-mode)
 
   (setq frame-resize-pixelwise t) ;; fix full-size issue on Xming
-  (setq default-frame-alist '(;; Explicit size/position is useful only for
-                              ;; GTK builds over X11 to overcome resize issue.
-                              ;; Not required for LUCID builds
-                              ;; (left . 50)
-                              ;; (top . 50)
-                              ;; (width . 90)  ; chars
-                              ;; (height . 30) ; lines
-                              (alpha . (90 . 75))
+  (setq default-frame-alist '(;; (alpha . (90 . 75))
                               (vertical-scroll-bars . nil)
-                              (horizontal-scroll-bars . nil)
-                              ;; (font . "InputMono-11")
-                              ;; (font . "FiraCode-11")
-                              ;; (font . "DejaVuSansMono-11")
-                              ))
-  (menu-bar-mode -1)
-
+                              (horizontal-scroll-bars . nil)))
 
   ;; set font
-  (set-face-attribute 'default nil :font "Fira Code Nerd Font" :height 120)
+  (set-face-attribute 'default nil :font "Fira Code Nerd Font Mono" :height 120)
   ;; fixed pitch face
-  (set-face-attribute 'fixed-pitch nil :font "Fira Code Nerd Font" :height 120)
+  (set-face-attribute 'fixed-pitch nil :font "Fira Code Nerd Font Mono" :height 120)
   ;; variable pitch face
   (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)
 
   ;; unicode fonts remap
-  (require 'unicode-fonts)
-  (setq unicode-fonts-skip-font-groups '(low-quality-gyphs))
-  (mapc
-   (lambda (block-name)
-     (let* ((old-font "Apple Color Emoji")
-            (new-font "Noto Color Emoji")
-            (block-idx (cl-position-if
-                        (lambda (i) (string-equal (car i) block-name))
-                        unicode-fonts-block-font-mapping))
-            (block-fonts (cadr (nth block-idx unicode-fonts-block-font-mapping)))
-            (updated-block (cl-substitute new-font old-font block-fonts :test 'string-equal)))
-       (setf (cdr (nth block-idx unicode-fonts-block-font-mapping))
-             `(,updated-block))))
-   '("Dingbats"
-     "Emoticons"
-     "Miscellaneous Symbols and Pictographs"
-     "Transport and Map Symbols"))
-  (unicode-fonts-setup)
+  ;; (require 'unicode-fonts)
+  ;; (setq unicode-fonts-skip-font-groups '(low-quality-gyphs))
+  ;; (mapc
+  ;;  (lambda (block-name)
+  ;;    (let* ((old-font "Apple Color Emoji")
+  ;;           (new-font "Noto Color Emoji")
+  ;;           (block-idx (cl-position-if
+  ;;                       (lambda (i) (string-equal (car i) block-name))
+  ;;                       unicode-fonts-block-font-mapping))
+  ;;           (block-fonts (cadr (nth block-idx unicode-fonts-block-font-mapping)))
+  ;;           (updated-block (cl-substitute new-font old-font block-fonts :test 'string-equal)))
+  ;;      (setf (cdr (nth block-idx unicode-fonts-block-font-mapping))
+  ;;            `(,updated-block))))
+  ;;  '("Dingbats"
+  ;;    "Emoticons"
+  ;;    "Miscellaneous Symbols and Pictographs"
+  ;;    "Transport and Map Symbols"))
+  ;; (unicode-fonts-setup)
 
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq gc-cons-threshold 50000000)
+;; reduce size to shorten GC pause
+(setq gc-cons-threshold  (* 5 1024 1024))
+
+;; start server
+(server-start)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
