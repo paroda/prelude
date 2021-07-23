@@ -26,7 +26,7 @@
 ;;
 ;;   None
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; OMMITED SPECIFIC INFO FOR pretty-lambdada.el 
+;; OMMITED SPECIFIC INFO FOR pretty-lambdada.el
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; This program is free software; you can redistribute it and/or
@@ -92,7 +92,7 @@ With ARG, turn mode on if ARG is positive, off otherwise."
          (font-lock-remove-keywords
           nil `(("(\\(fn\\)[\[[:space:]]"
                  (0 (progn (compose-region (match-beginning 1) (match-end 1)
-                                           ,(make-char 'greek-iso8859-7 107))
+                                           ,"𝛌")
                            nil)))))
          (save-excursion
            (goto-char (point-min))
@@ -115,7 +115,7 @@ nil means use clojure-pretty-lambda display for the current mode."
   (font-lock-add-keywords
    mode `(("(\\(fn\\)[\[[:space:]]"
    (0 (progn (compose-region (match-beginning 1) (match-end 1)
-        ,(make-char 'greek-iso8859-7 107))
+                             ,"𝛌")
       nil))))))
 
 (defun turn-on-clojure-pretty-lambda-mode  () (clojure-pretty-lambda-mode  1))

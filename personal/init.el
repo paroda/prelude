@@ -125,13 +125,19 @@
   (call-interactively #'load-theme))
 
 ;; prettify things
+
 (global-prettify-symbols-mode 1)
 
 (defun add-pretty-lambda ()
+  "Use a pretty lambda symbol"
+  (setq prettify-symbols-alist '(("lambda" . ?𝛌))))
+(dolist (m '(lisp-mode-hook emacs-lisp-mode-hook))
+  (add-hook m 'add-pretty-lambda))
+
+(defun add-pretty-org ()
   "Make some word or string show as pretty Unicode symbols. See https://unicodelookup.com for more."
   (setq prettify-symbols-alist
-        '(
-          ("lambda" . ?λ)
+        '(("lambda" . ?𝛌)
           ("->" . ?⟶)
           ("<=" . ?≤)
           (">=" . ?≥)
@@ -141,15 +147,13 @@
           ("#+end_src"    . ?□)
           ("#+BEGIN_EXAMPLE" . (?ℰ (Br . Bl) ?⇒)) ;; ℰ⇒
           ("#+begin_example" . (?ℰ (Br . Bl) ?⇒)) ;; ℰ⇒
-          ("#+END_EXAMPLE"    . ?⇐)               ;; ⇐
-          ("#+end_example"    . ?⇐)               ;; ⇐
+          ("#+END_EXAMPLE"    . ?⇐)
+          ("#+end_example"    . ?⇐)
           ("#+BEGIN_QUOTE" . (?𝒬 (Br . Bl) ?⇒))   ;; 𝒬⇒
           ("#+begin_quote" . (?𝒬 (Br . Bl) ?⇒))   ;; 𝒬⇒
-          ("#+END_QUOTE"    . ?⇐)                 ;; ⇐
-          ("#+end_quote"    . ?⇐)                 ;; ⇐
-          )))
-
-(add-hook 'org-mode-hook 'add-pretty-lambda)
+          ("#+END_QUOTE"    . ?⇐)
+          ("#+end_quote"    . ?⇐))))
+(add-hook 'org-mode-hook 'add-pretty-org)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -367,9 +371,11 @@
 (require 'clojure-mode-extra-font-locking)
 
 ;; enable pretty lambda (replace fn keyword with greek letter)
-(require 'clojure-pretty-lambda)
+(defun add-pretty-clojure ()
+  "Use a pretty lambda symbol"
+  (setq prettify-symbols-alist '(("fn" . ?𝛌))))
 (dolist (m '(clojure-mode-hook clojurescript-mode-hook cider-repl-mode-hook))
-  (add-hook m 'clojure-pretty-lambda-mode))
+  (add-hook m 'add-pretty-clojure))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; graphviz
