@@ -171,8 +171,16 @@
 ;; dired hotkey
 (define-key dired-mode-map (kbd "r") 'dired-kill-subdir)
 
+(defun my-dired-show-disk-usage ()
+  (interactive)
+  (let* ((filename (dired-get-filename))
+         (cmd (concat "du -d0 " filename)))
+    (shell-command cmd)))
+(define-key dired-mode-map (kbd "z") 'my-dired-show-disk-usage)
+
 ;; editing hotkey
 (global-set-key (kbd "M-O") 'crux-smart-open-line-above)
+(global-set-key (kbd "M-RET") 'comment-indent-new-line)
 
 ;; hotkey for vc refresh state
 (global-set-key (kbd "C-x v 0") 'vc-refresh-state)
