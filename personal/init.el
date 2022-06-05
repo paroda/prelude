@@ -156,6 +156,9 @@
 (set-face-attribute 'show-paren-match nil
                     :foreground "white" :background "#2257A0")
 
+(set-face-attribute 'mode-line nil :box '(:line-width -1 :style released-button))
+(set-face-attribute 'mode-line-inactive nil :box '(:line-width -1 :style pressed-button))
+
 ;; enable flashing mode-line on errors
 (doom-themes-visual-bell-config)
 
