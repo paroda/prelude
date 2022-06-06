@@ -159,6 +159,9 @@
 (set-face-attribute 'mode-line nil :box '(:line-width -1 :style released-button))
 (set-face-attribute 'mode-line-inactive nil :box '(:line-width -1 :style pressed-button))
 
+(set-face-attribute 'mode-line nil :background "#210")
+(set-face-attribute 'mode-line-inactive nil :background "#012")
+
 ;; enable flashing mode-line on errors
 (doom-themes-visual-bell-config)
 
@@ -169,7 +172,8 @@
 ;; enable doom-modeline
 
 (require 'doom-modeline)
-(setq doom-modeline-height 36)
+(setq doom-modeline-height 40
+      doom-modeline-bar-width 8)
 (add-hook 'after-init-hook #'doom-modeline-mode)
 (add-hook 'calc-mode-hook
           (lambda ()
