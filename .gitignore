@@ -38,3 +38,7 @@ gotools/
 
 /eln-cache/
 /speed-type/
+/nov-places
+/image-dired/
+
+personal/flycheck_init.el
