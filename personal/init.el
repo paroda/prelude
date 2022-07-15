@@ -425,9 +425,9 @@
   (add-hook m 'add-pretty-clojure))
 
 ;; hide all block on load
-(add-hook 'clojure-mode-hook #'hs-hide-all)
-(add-hook 'clojurec-mode-hook #'hs-hide-all)
-(add-hook 'clojurescript-mode-hook #'hs-hide-all)
+;; (add-hook 'clojure-mode-hook #'hs-hide-all)
+;; (add-hook 'clojurec-mode-hook #'hs-hide-all)
+;; (add-hook 'clojurescript-mode-hook #'hs-hide-all)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; graphviz
@@ -671,6 +671,11 @@
     (define-key map (kbd "C-a") 'vterm-send-C-a)
     (define-key map (kbd "C-e") 'vterm-send-C-e)
     (define-key map (kbd "C-c C-y") 'vterm-send-C-y)
+    (define-key map (kbd "<f3>") 'winner-undo)
+    (define-key map (kbd "<f4>") 'winner-redo)
+    (define-key map (kbd "<f7>") 'other-window)
+    (define-key map (kbd "<f8>") 'switch-to-prev-buffer)
+    (define-key map (kbd "<f9>") 'switch-to-next-buffer)
     map)
   "Keymap for VTerm minor mode.")
 
@@ -749,13 +754,33 @@
   ;;    "Transport and Map Symbols"))
   ;; (unicode-fonts-setup)
 
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
   ;; reduce size to shorten GC pause
   (setq gc-cons-threshold  (* 5 1024 1024)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CIDER / Projects
+
+;; (define-key cider-mode-map (kbd "<f5>")
+;;   (lambda ()
+;;     (interactive)
+;;     (cider-interactive-eval "(require 'dev)(dev/reset)")))
+
+;; (define-key cider-repl-mode-map (kbd "<f5>")
+;;   (lambda ()
+;;     (interactive)
+;;     (cider-interactive-eval "(require 'dev)(dev/reset)")))
+
+(define-key cider-mode-map (kbd "C-<f5>")
+  (lambda ()
+    (interactive)
+    (cider-find-and-clear-repl-output t)))
+
+(define-key cider-repl-mode-map (kbd "C-<f5>")
+  (lambda ()
+    (interactive)
+    (cider-find-and-clear-repl-output t)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; start server
 ;; (server-start)
 
