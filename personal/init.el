@@ -713,49 +713,34 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; GUI Only!!
 
-(when (display-graphic-p)
+(defun my-setup-gui ()
+  (interactive)
+  (when (display-graphic-p)
 
-  (require 'all-the-icons) ;; load icons
-  (require 'treemacs-icons-dired)
-  (treemacs-icons-dired-mode)
+    (require 'all-the-icons) ;; load icons
+    (require 'treemacs-icons-dired)
+    (treemacs-icons-dired-mode)
 
-  (setq frame-resize-pixelwise t) ;; fix full-size issue on Xming
-  (setq default-frame-alist '(;; (alpha . (90 . 75))
-                              (vertical-scroll-bars . nil)
-                              (horizontal-scroll-bars . nil)))
+    (setq frame-resize-pixelwise t) ;; fix full-size issue on Xming
+    (setq default-frame-alist '(;; (alpha . (90 . 75))
+                                (vertical-scroll-bars . nil)
+                                (horizontal-scroll-bars . nil)))
 
-  ;; Font
-  (when (member "FiraCode Nerd Font Mono" (font-family-list))
-    ;; set font
-    (set-face-attribute 'default nil :font "Fira Code Nerd Font Mono" :height 120)
-    ;; fixed pitch face
-    (set-face-attribute 'fixed-pitch nil :font "Fira Code Nerd Font Mono" :height 120))
-  (when (member "Cantarell" (font-family-list))
-    ;; variable pitch face
-    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular))
+    ;; Font
+    (when (member "FiraCode Nerd Font Mono" (font-family-list))
+      ;; set font
+      (set-face-attribute 'default nil :font "Fira Code Nerd Font Mono" :height 120)
+      ;; fixed pitch face
+      (set-face-attribute 'fixed-pitch nil :font "Fira Code Nerd Font Mono" :height 120))
+    (when (member "Cantarell" (font-family-list))
+      ;; variable pitch face
+      (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular))))
 
-  ;; unicode fonts remap
-  ;; (require 'unicode-fonts)
-  ;; (setq unicode-fonts-skip-font-groups '(low-quality-gyphs))
-  ;; (mapc
-  ;;  (lambda (block-name)
-  ;;    (let* ((old-font "Apple Color Emoji")
-  ;;           (new-font "Noto Color Emoji")
-  ;;           (block-idx (cl-position-if
-  ;;                       (lambda (i) (string-equal (car i) block-name))
-  ;;                       unicode-fonts-block-font-mapping))
-  ;;           (block-fonts (cadr (nth block-idx unicode-fonts-block-font-mapping)))
-  ;;           (updated-block (cl-substitute new-font old-font block-fonts :test 'string-equal)))
-  ;;      (setf (cdr (nth block-idx unicode-fonts-block-font-mapping))
-  ;;            `(,updated-block))))
-  ;;  '("Dingbats"
-  ;;    "Emoticons"
-  ;;    "Miscellaneous Symbols and Pictographs"
-  ;;    "Transport and Map Symbols"))
-  ;; (unicode-fonts-setup)
+(my-setup-gui)
 
-  ;; reduce size to shorten GC pause
-  (setq gc-cons-threshold  (* 5 1024 1024)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; reduce size to shorten GC pause
+(setq gc-cons-threshold  (* 5 1024 1024))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CIDER / Projects
