@@ -74,14 +74,18 @@
 ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
 ;; For some commands and buffer sources it is useful to configure the
 ;; :preview-key on a per-command basis using the `consult-customize' macro.
-(consult-customize
- consult-theme
- :preview-key '(:debounce 0.2 any)
- consult-ripgrep consult-git-grep consult-grep
- consult-bookmark consult-recent-file consult-xref
- consult--source-bookmark consult--source-recent-file
- consult--source-project-recent-file
- :preview-key (kbd "M-."))
+;;
+;; NOTE: this would disable the automatic preview for those commands for which
+;;       a diffrent :preview-key is specified other than 'any
+;;
+;; (consult-customize
+;;  consult-theme
+;;  :preview-key '(:debounce 0.2 any)
+;;  consult-ripgrep consult-git-grep consult-grep
+;;  consult-bookmark consult-recent-file consult-xref
+;;  consult--source-bookmark consult--source-recent-file
+;;  consult--source-project-recent-file
+;;  :preview-key (kbd "M-."))
 
 ;; Optionally configure the narrowing key.
 ;; Both < and C-+ work reasonably well.
