@@ -35,10 +35,9 @@ var/
 .cache/
 .lsp-session*
 gotools/
+personal/flycheck_init.el
+eln-cache/
 
-/eln-cache/
 /speed-type/
 /nov-places
 /image-dired/
-
-personal/flycheck_init.el
