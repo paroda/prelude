@@ -45,6 +45,9 @@
     js2-refactor
     json-mode
 
+    rtags
+    ;; cmake-ide
+
     doom-themes
     doom-modeline
     highlight-symbol
@@ -381,6 +384,13 @@
               (append flycheck-disabled-checkers
                       '(javascript-jshint
                         json-jsonlint)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; c/c++
+
+(require 'rtags)
+;; (cmake-ide-setup)
+(require 'prelude-c)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Clojure extra
