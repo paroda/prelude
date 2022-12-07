@@ -25,11 +25,11 @@
     gnuplot
     ;; pandoc-mode
 
-    selectrum
+    vertico
     consult
     consult-flycheck
+    orderless
     company-box
-    company-prescient
     ibuffer-projectile
     marginalia
     embark
@@ -222,12 +222,77 @@
           ("#+end_quote"    . ?⇐))))
 (add-hook 'org-mode-hook 'add-pretty-org)
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; selectrum
-(require 'prelude-selectrum)
-(require 'consult-selectrum-config)
-(global-set-key (kbd "C-x C-z") #'selectrum-repeat)
+(require 'consult)
+
+;; vertico
+(require 'vertico)
+(vertico-mode)
+(global-set-key (kbd "C-x C-z") #'vertico-repeat)
+
+(require 'consult-config)
+
+;; orderless
+(require 'orderless)
+
+(defvar +orderless-dispatch-alist
+  '((?% . char-fold-to-regexp)
+    (?! . orderless-without-literal)
+    (?`. orderless-initialism)
+    (?= . orderless-literal)
+    (?~ . orderless-flex)))
+
+(defun +orderless--suffix-regexp ()
+  (if (and (boundp 'consult--tofu-char) (boundp 'consult--tofu-range))
+      (format "[%c-%c]*$"
+              consult--tofu-char
+              (+ consult--tofu-char consult--tofu-range -1))
+    "$"))
+
+;; Recognizes the following patterns:
+;; * ~flex flex~
+;; * =literal literal=
+;; * %char-fold char-fold%
+;; * `initialism initialism`
+;; * !without-literal without-literal!
+;; * .ext (file extension)
+;; * regexp$ (regexp matching at end)
+(defun +orderless-dispatch (word _index _total)
+  (cond
+   ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
+   ((string-suffix-p "$" word)
+    `(orderless-regexp . ,(concat (substring word 0 -1) (+orderless--suffix-regexp))))
+   ;; File extensions
+   ((and (or minibuffer-completing-file-name
+             (derived-mode-p 'eshell-mode))
+         (string-match-p "\\`\\.." word))
+    `(orderless-regexp . ,(concat "\\." (substring word 1) (+orderless--suffix-regexp))))
+   ;; Ignore single !
+   ((equal "!" word) `(orderless-literal . ""))
+   ;; Prefix and suffix
+   ((if-let (x (assq (aref word 0) +orderless-dispatch-alist))
+        (cons (cdr x) (substring word 1))
+      (when-let (x (assq (aref word (1- (length word))) +orderless-dispatch-alist))
+        (cons (cdr x) (substring word 0 -1)))))))
+
+;; Define orderless style with initialism by default
+(orderless-define-completion-style +orderless-with-initialism
+                                   (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
+
+(setq completion-styles '(orderless basic)
+      completion-category-defaults nil
+      ;;; Enable partial configuration for files.
+      ;;; Either give orderless precedence or partial-completion.
+      ;;; Note that completion-category-overrides is not really an override,
+      ;;; but rather prepended to the default completion-styles.
+      completion-category-overrides '((file (styles partial-completion)) ;; partial completion is tried first
+                                      ;; enable initialism by default for symbols
+                                      (command (styles +orderless-with-initialism))
+                                      (variable (styles +orderless-with-initialism))
+                                      (symbol (styles +orderless-with-initialism)))
+      orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
+      orderless-style-dispatchers '(+orderless-dispatch))
 
 ;; marginalia
 (require 'marginalia)
@@ -236,8 +301,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; company
 (require 'prelude-company)
-(require 'company-prescient)
-(company-prescient-mode t)
 (require 'company-box)
 (global-set-key (kbd "M-TAB") #'company-complete)
 (add-hook 'company-mode-hook 'company-box-mode)
@@ -258,27 +321,6 @@
               (ibuffer-do-sort-by-alphabetic))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; consult - extras
-(defun consult-fd (&optional dir initial) ;; NOTE: require fd be installed
-  (interactive "P")
-  (let ((consult-find-command "fd --color=never --full-path ARG OPTS"))
-    (consult-find dir initial)))
-(global-set-key (kbd "C-c c F") 'consult-fd)
-
-(defvar-local consult-toggle-preview-orig nil)
-(defun consult-toggle-preview ()
-  "Command to enable/disable preview."
-  (interactive)
-  (if consult-toggle-preview-orig
-      (setq consult--preview-function consult-toggle-preview-orig
-            consult-toggle-preview-orig nil)
-    (setq consult-toggle-preview-orig consult--preview-function
-          consult--preview-function #'ignore)))
-(define-key selectrum-minibuffer-map (kbd "M-P") #'consult-toggle-preview)
-
-(setq consult-locate-args  "locate --ignore-case --existing --regexp")
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; embark - consult
 (require 'embark)
 
@@ -291,7 +333,6 @@
 
 ;; embark-consult
 (require 'embark-consult)
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; set arrow keys in isearch
@@ -389,8 +430,17 @@
 ;; c/c++
 
 (require 'rtags)
+;; (require 'cmake-ide)
 ;; (cmake-ide-setup)
 (require 'prelude-c)
+
+;; (setq rtags-completions-enabled t
+;;       rtags-path "~/.dipu/rtags/src/rtags.el"
+;;       rtags-rc-binary-name "~/.dipu/rtags/bin/rc"
+;;       rtags-rdm-binary-name "~/.dipu/rtags/bin/rdm")
+;; (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
+;; (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Clojure extra
