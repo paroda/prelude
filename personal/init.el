@@ -646,6 +646,13 @@
     (message "Region sha1 hash: %s, (C-y to insert)," hash)
     (kill-new hash)))
 
+(defun sha256-region (start end)
+  "Computes the SHA256 hash of currently selected region."
+  (interactive "r")
+  (let ((hash (embark-hash-sha256 (buffer-substring start end))))
+    (deactivate-mark)
+    (message "Region sha256 hash: %s, (C-y to insert)," hash)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; treemacs setup
 
@@ -730,7 +737,7 @@
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-a") 'vterm-send-C-a)
     (define-key map (kbd "C-e") 'vterm-send-C-e)
-    (define-key map (kbd "C-c C-y") 'vterm-send-C-y)
+    ;; (define-key map (kbd "C-c C-y") (lambda () (interactive) (vterm-send "C-y")))
     (define-key map (kbd "<f3>") 'winner-undo)
     (define-key map (kbd "<f4>") 'winner-redo)
     (define-key map (kbd "<f7>") 'other-window)
