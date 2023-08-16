@@ -178,10 +178,7 @@
 (setq doom-modeline-height 40
       doom-modeline-bar-width 8)
 (add-hook 'after-init-hook #'doom-modeline-mode)
-(add-hook 'calc-mode-hook
-          (lambda ()
-            (setq mode-line-format '("%e" mode-line-buffer-identification
-                                     (:eval (doom-modeline-format--main))))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -815,12 +812,14 @@
 ;; (define-key cider-mode-map (kbd "<f5>")
 ;;   (lambda ()
 ;;     (interactive)
-;;     (cider-interactive-eval "(require 'dev)(dev/reset)")))
+;;     ;; (cider-interactive-eval "(require 'dev)(dev/reset)")
+;;     (cider-interactive-eval "(require '[integrant.repl :as ir])(require '[allstreet.astro.starter.main :as astro-starter])(ir/set-prep! #(astro-starter/ig-config))(ir/reset)")))
 
 ;; (define-key cider-repl-mode-map (kbd "<f5>")
 ;;   (lambda ()
 ;;     (interactive)
-;;     (cider-interactive-eval "(require 'dev)(dev/reset)")))
+;;     ;; (cider-interactive-eval "(require 'dev)(dev/reset)")
+;;     (cider-interactive-eval "(require '[integrant.repl :as ir])(require '[allstreet.astro.starter.main :as astro-starter])(ir/set-prep! #(astro-starter/ig-config))(ir/reset)")))
 
 (define-key cider-mode-map (kbd "C-<f5>")
   (lambda ()
