@@ -762,6 +762,7 @@
   (setq vterm-buffer-name-string "vterm:%s")
   (setq vterm-kill-buffer-on-exit t)
   (setq vterm-copy-exclude-prompt t)
+  (setq vterm-copy-mode-remove-fake-newlines t)
 
   (add-hook 'vterm-mode-hook
             (lambda ()
