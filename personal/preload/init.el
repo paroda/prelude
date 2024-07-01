@@ -1,10 +1,13 @@
 ;;;; Code
 
+;; startup speed, annoyance suppression
 (setq gc-cons-threshold 100000000)
+(setq byte-compile-warnings '(not obsolete))
+(setq warning-suppress-log-types '((comp) (bytecomp)))
+(setq native-comp-async-report-warnings-error 'silent)
 
-;; a bug fixed in 26.3, until then keep the below line
-(when (version< emacs-version "26.3")
-  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+;; silence stupid startup message
+(setq inhibit-startup-echo-area-message (user-login-name))
 
 ;; enable native compilation when available
 (when (and (fboundp 'native-comp-available-p)

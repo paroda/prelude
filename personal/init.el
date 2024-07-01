@@ -4,7 +4,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq gc-cons-threshold (* 100 1024 1024))
+(setq gc-cons-threshold 100000000)
 
 ;; Unbind unneeded keys
 (global-set-key (kbd "C-z") nil)
@@ -104,6 +104,7 @@
 ;; window & buffer hotkey
 (global-set-key (kbd "<f3>") 'winner-undo)
 (global-set-key (kbd "<f4>") 'winner-redo)
+(global-set-key (kbd "C-<f4>") 'kill-buffer-and-window)
 (global-set-key (kbd "<f7>") 'other-window)
 (global-set-key (kbd "<f8>") 'switch-to-prev-buffer)
 (global-set-key (kbd "<f9>") 'switch-to-next-buffer)
