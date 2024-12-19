@@ -118,6 +118,8 @@
 
 (global-set-key (kbd "C-x k") 'kill-current-buffer)
 
+(global-set-key (kbd "C-c C-/ u") 'browse-url)
+
 ;; repurpose C-_ for contract region to complement C-= for expand region
 (define-key undo-tree-map (kbd "C-_") nil)
 (global-set-key (kbd "C-_") 'er/contract-region)
@@ -276,7 +278,7 @@
 
 ;; Define orderless style with initialism by default
 (orderless-define-completion-style +orderless-with-initialism
-                                   (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
+  (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
 
 (setq completion-styles '(orderless basic)
       completion-category-defaults nil
@@ -729,6 +731,12 @@
   (define-key treemacs-mode-map [mouse-1] 'treemacs-single-click-expand-action))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; speed-type
+
+(when (package-installed-p 'speed-type)
+  (add-hook 'speed-type-mode-hook (lambda () (company-mode -1))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; vterm setup
 
 (defvar vterm-minor-mode-map
@@ -779,9 +787,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; GUI Only!!
 
+(setq my-setup-gui-done nil)
+
 (defun my-setup-gui ()
   (interactive)
-  (when (display-graphic-p)
+  (when (and (not my-setup-gui-done) (display-graphic-p))
+    (message "my-gui-setup-done")
+    (setq my-setup-gui-done t)
 
     (require 'all-the-icons) ;; load icons
     (require 'treemacs-icons-dired)
@@ -801,6 +813,8 @@
     (when (member "Cantarell" (font-family-list))
       ;; variable pitch face
       (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular))))
+
+(add-hook 'after-make-frame-functions (lambda (frame) (my-setup-gui)))
 
 (my-setup-gui)
 
