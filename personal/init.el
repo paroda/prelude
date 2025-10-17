@@ -73,6 +73,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; override prelude
 (setq
+ auto-save-default nil
  ;; prelude-flyspell nil ;; disable flyspell
  prelude-auto-save nil ;; disable auto save of prelude
  super-save-remote-files nil)
@@ -82,6 +83,8 @@
 (global-set-key (kbd "C-x p") project-prefix-map)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; (setq initial-major-mode 'text-mode)
 
 (setq
  confirm-kill-emacs 'y-or-n-p
@@ -120,6 +123,8 @@
 
 (global-set-key (kbd "C-c C-/ u") 'browse-url)
 
+(global-set-key (kbd "C-x x x") 'crux-create-scratch-buffer)
+
 ;; repurpose C-_ for contract region to complement C-= for expand region
 (define-key undo-tree-map (kbd "C-_") nil)
 (global-set-key (kbd "C-_") 'er/contract-region)
@@ -142,7 +147,7 @@
 (defun my-dired-show-disk-usage ()
   (interactive)
   (let* ((filename (dired-get-filename))
-         (cmd (concat "du -h -d0 " filename)))
+         (cmd (concat "du -h -d0 '" filename "'")))
     (shell-command cmd)))
 (define-key dired-mode-map (kbd "z") 'my-dired-show-disk-usage)
 
@@ -344,9 +349,9 @@
 (define-key isearch-mode-map (kbd "<left>") 'isearch-repeat-backward)
 (define-key isearch-mode-map (kbd "<right>") 'isearch-repeat-forward)
 (define-key minibuffer-local-isearch-map (kbd "<left>")
-  'isearch-reverse-exit-minibuffer)
+            'isearch-reverse-exit-minibuffer)
 (define-key minibuffer-local-isearch-map (kbd "<right>")
-  'isearch-forward-exit-minibuffer)
+            'isearch-forward-exit-minibuffer)
 (global-set-key (kbd "C-S-s") 'isearch-forward-thing-at-point)
 (setq isearch-allow-motion t)
 
@@ -519,6 +524,7 @@
 (require 'ob-http)
 
 (setq org-ellipsis " ▾"
+      org-hide-leading-stars nil
       org-hide-emphasis-markers t
       org-src-fontify-natively t
       org-src-tab-acts-natively t
@@ -527,8 +533,9 @@
       org-src-preserve-indentation nil
       org-startup-folded 'content
       org-cycle-separator-lines 1
-      org-adapt-indentation nil
-      org-indent-indentation-per-level 2)
+      org-adapt-indentation t
+      org-indent-indentation-per-level 2
+      )
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -541,23 +548,26 @@
             (visual-line-mode 1)))
 
 (setq org-superstar-remove-leading-stars t
-      org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●"))
+      ;; org-superstar-leading-bullet "⋯"
+      org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")
+      org-superstar-item-bullet-alist '((42 . 9702) (43 . 10148) (45 . 8226))
+      )
 
-(dolist (face '((org-level-1 . 1.2)
-                (org-level-2 . 1.1)
-                (org-level-3 . 1.05)
+(dolist (face '((org-level-1 . 1.3)
+                (org-level-2 . 1.2)
+                (org-level-3 . 1.1)
                 (org-level-4 . 1.0)
-                (org-level-5 . 1.1)
-                (org-level-6 . 1.1)
-                (org-level-7 . 1.1)
-                (org-level-8 . 1.1)))
+                (org-level-5 . 1.0)
+                (org-level-6 . 1.0)
+                (org-level-7 . 1.0)
+                (org-level-8 . 1.0)))
   (set-face-attribute (car face) nil
-                      :font "Cantarell" :weight 'regular :height (cdr face)))
+                      :font "DejaVu Sans" :weight 'regular :height (cdr face)))
 
 ;; Ensure that anything that should be fixed-pitch in Org files appears that way
 (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+(set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+;; (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
 (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
 (set-face-attribute 'org-special-keyword nil
                     :inherit '(font-lock-comment-face fixed-pitch))
@@ -825,27 +835,29 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CIDER / Projects
 
-;; (define-key cider-mode-map (kbd "<f5>")
-;;   (lambda ()
-;;     (interactive)
-;;     ;; (cider-interactive-eval "(require 'dev)(dev/reset)")
-;;     (cider-interactive-eval "(require '[integrant.repl :as ir])(require '[allstreet.astro.starter.main :as astro-starter])(ir/set-prep! #(astro-starter/ig-config))(ir/reset)")))
+(define-key cider-mode-map (kbd "<f5>")
+            (lambda ()
+              (interactive)
+              (cider-interactive-eval "(do
+(reset! ruped.simple-init-core.base/function nil)
+(ruped.simple-init-core.base/run))")))
 
-;; (define-key cider-repl-mode-map (kbd "<f5>")
-;;   (lambda ()
-;;     (interactive)
-;;     ;; (cider-interactive-eval "(require 'dev)(dev/reset)")
-;;     (cider-interactive-eval "(require '[integrant.repl :as ir])(require '[allstreet.astro.starter.main :as astro-starter])(ir/set-prep! #(astro-starter/ig-config))(ir/reset)")))
+(define-key cider-repl-mode-map (kbd "<f5>")
+            (lambda ()
+              (interactive)
+              (cider-interactive-eval "(do
+ (reset! ruped.simple-init-core.base/function nil)
+ (ruped.simple-init-core.base/run))")))
 
 (define-key cider-mode-map (kbd "C-<f5>")
-  (lambda ()
-    (interactive)
-    (cider-find-and-clear-repl-output t)))
+            (lambda ()
+              (interactive)
+              (cider-find-and-clear-repl-output t)))
 
 (define-key cider-repl-mode-map (kbd "C-<f5>")
-  (lambda ()
-    (interactive)
-    (cider-find-and-clear-repl-output t)))
+            (lambda ()
+              (interactive)
+              (cider-find-and-clear-repl-output t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; start server
