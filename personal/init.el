@@ -562,7 +562,7 @@
                 (org-level-7 . 1.0)
                 (org-level-8 . 1.0)))
   (set-face-attribute (car face) nil
-                      :font "DejaVu Sans" :weight 'regular :height (cdr face)))
+                      :font "Paper Mono" :weight 'regular :height (cdr face)))
 
 ;; Ensure that anything that should be fixed-pitch in Org files appears that way
 (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
@@ -787,8 +787,9 @@
             (lambda ()
               (vterm-minor-mode 1)
               (set (make-local-variable 'buffer-face-mode-face)
-                   '(:family "Fira Code Nerd Font Mono" :height 120))
+                   '(:family "DejaVuSansM Nerd Font Mono" :height 120))
               (buffer-face-mode t)))
+
   (define-key vterm-copy-mode-map (kbd "C-a") 'vterm-beginning-of-line)
   (define-key vterm-copy-mode-map (kbd "C-e") 'vterm-end-of-line)
   (define-key prelude-mode-map (kbd "C-c t") 'vterm)
@@ -815,11 +816,11 @@
                                 (horizontal-scroll-bars . nil)))
 
     ;; Font
-    (when (member "FiraCode Nerd Font Mono" (font-family-list))
+    (when (member "Paper Mono" (font-family-list))
       ;; set font
-      (set-face-attribute 'default nil :font "Fira Code Nerd Font Mono" :height 120)
+      (set-face-attribute 'default nil :font "Paper Mono" :height 120)
       ;; fixed pitch face
-      (set-face-attribute 'fixed-pitch nil :font "Fira Code Nerd Font Mono" :height 120))
+      (set-face-attribute 'fixed-pitch nil :font "Paper Mono" :height 120))
     (when (member "Cantarell" (font-family-list))
       ;; variable pitch face
       (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular))))
@@ -835,19 +836,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CIDER / Projects
 
-(define-key cider-mode-map (kbd "<f5>")
-            (lambda ()
-              (interactive)
-              (cider-interactive-eval "(do
-(reset! ruped.simple-init-core.base/function nil)
-(ruped.simple-init-core.base/run))")))
+;; (define-key cider-mode-map (kbd "<f5>")
+;;             (lambda ()
+;;               (interactive)
+;;               (cider-interactive-eval "(do
+;; (reset! ruped.simple-init-core.base/function nil)
+;; (ruped.simple-init-core.base/run))")))
 
-(define-key cider-repl-mode-map (kbd "<f5>")
-            (lambda ()
-              (interactive)
-              (cider-interactive-eval "(do
- (reset! ruped.simple-init-core.base/function nil)
- (ruped.simple-init-core.base/run))")))
+;; (define-key cider-repl-mode-map (kbd "<f5>")
+;;             (lambda ()
+;;               (interactive)
+;;               (cider-interactive-eval "(do
+;;  (reset! ruped.simple-init-core.base/function nil)
+;;  (ruped.simple-init-core.base/run))")))
 
 (define-key cider-mode-map (kbd "C-<f5>")
             (lambda ()
