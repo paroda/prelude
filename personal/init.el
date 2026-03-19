@@ -29,7 +29,7 @@
     consult
     consult-flycheck
     orderless
-    company-box
+    ;; company-box
     ibuffer-projectile
     marginalia
     embark
@@ -306,11 +306,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; company
 (require 'prelude-company)
-(require 'company-box)
-(global-set-key (kbd "M-TAB") #'company-complete)
-(add-hook 'company-mode-hook 'company-box-mode)
-(setf (alist-get 'left-fringe company-box-frame-parameters) 10)
-(setf (alist-get 'right-fringe company-box-frame-parameters) 10)
+;; (require 'company-box)
+;; (global-set-key (kbd "M-TAB") #'company-complete)
+;; (add-hook 'company-mode-hook 'company-box-mode)
+;; (setf (alist-get 'left-fringe company-box-frame-parameters) 10)
+;; (setf (alist-get 'right-fringe company-box-frame-parameters) 10)
 
 ;; popups
 (set-face-attribute 'tooltip nil :background "#334455")
@@ -787,7 +787,7 @@
             (lambda ()
               (vterm-minor-mode 1)
               (set (make-local-variable 'buffer-face-mode-face)
-                   '(:family "Fira Code Nerd Font Mono" :height 120))
+                   '(:family "FiraCode Nerd Font Mono" :height 120))
               (buffer-face-mode t)))
   (define-key vterm-copy-mode-map (kbd "C-a") 'vterm-beginning-of-line)
   (define-key vterm-copy-mode-map (kbd "C-e") 'vterm-end-of-line)
@@ -822,7 +822,8 @@
       (set-face-attribute 'fixed-pitch nil :font "Fira Code Nerd Font Mono" :height 120))
     (when (member "Cantarell" (font-family-list))
       ;; variable pitch face
-      (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular))))
+      (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular))
+    (set-fontset-font "fontset-default" '(#x0f0000 . #x0f1fff) "Symbols Nerd Font Mono")))
 
 (add-hook 'after-make-frame-functions (lambda (frame) (my-setup-gui)))
 
