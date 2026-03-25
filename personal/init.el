@@ -82,6 +82,10 @@
 
 (global-set-key (kbd "C-x p") project-prefix-map)
 
+(require 'prelude-org)
+(global-unset-key (kbd "C-c c"))
+(global-set-key (kbd "C-c c c") 'org-capture)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; (setq initial-major-mode 'text-mode)
@@ -307,14 +311,21 @@
 ;; company
 (require 'prelude-company)
 ;; (require 'company-box)
-;; (global-set-key (kbd "M-TAB") #'company-complete)
-;; (add-hook 'company-mode-hook 'company-box-mode)
-;; (setf (alist-get 'left-fringe company-box-frame-parameters) 10)
-;; (setf (alist-get 'right-fringe company-box-frame-parameters) 10)
+
+(when (package-installed-p 'company-box)
+  (global-set-key (kbd "M-TAB") #'company-complete)
+  (add-hook 'company-mode-hook 'company-box-mode)
+  (setf (alist-get 'left-fringe company-box-frame-parameters) 10)
+  (setf (alist-get 'right-fringe company-box-frame-parameters) 10))
 
 ;; popups
 (set-face-attribute 'tooltip nil :background "#334455")
-(set-face-attribute 'company-tooltip nil :background "#283644")
+(when (package-installed-p 'company)
+  (set-face-attribute 'company-tooltip nil :background "#283644"))
+
+;; disable in text-mode
+(when (package-installed-p 'company)
+  (add-hook 'text-mode-hook (lambda () (company-mode -1))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; enable ibuffer grouping as vcs
@@ -394,9 +405,11 @@
 (define-key flyspell-mode-map (kbd "C-;") nil)
 
 ;; Show line numbers
-(require 'nlinum)
-(setq nlinum-highlight-current-line t)
-(global-nlinum-mode -1)
+
+;; (require 'nlinum)
+;; (setq nlinum-highlight-current-line t)
+;; (global-nlinum-mode -1
+
 ;; (add-hook 'text-mode-hook #'display-line-numbers-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 
@@ -458,8 +471,11 @@
 ;; cider mode enable history file
 (setq cider-repl-history-file "~/.cider-repl-history")
 (setq cider-repl-history-size 1000)
+
 ;; set completion hotkey to use company
-(define-key cider-mode-map (kbd "C-M-i") 'company-complete)
+(when (and (package-installed-p 'cider)
+           (package-installed-p 'company))
+  (define-key cider-mode-map (kbd "C-M-i") 'company-complete))
 
 ;; setup flycheck linters
 (require 'flycheck)
@@ -743,7 +759,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; speed-type
 
-(when (package-installed-p 'speed-type)
+(when (and (package-installed-p 'speed-type)
+           (package-installed-p 'company))
   (add-hook 'speed-type-mode-hook (lambda () (company-mode -1))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
