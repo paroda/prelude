@@ -1,4 +1,4 @@
-;;;
+;;;  -*- lexical-binding: t; -*-
 ;;; consult-config.el --- Provide configuration for Consult
 
 ;;; Code:

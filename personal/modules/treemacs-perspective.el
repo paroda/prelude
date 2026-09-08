@@ -1,4 +1,4 @@
-;;
+;;  -*- lexical-binding: t; -*-
 ;;; treemacs-perspective.el --- Provide an integration
 ;;                              between treemacs and perspective
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

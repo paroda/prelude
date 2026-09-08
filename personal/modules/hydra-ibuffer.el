@@ -1,4 +1,4 @@
-;;
+;;  -*- lexical-binding: t; -*-
 ;;; hydra-ibuffer.el --- Provide a nested menu on ibuffer
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

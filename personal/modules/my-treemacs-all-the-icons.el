@@ -1,4 +1,4 @@
-;; my-treemacs-all-the-icons.el --- override a few icons in treemacs
+;; my-treemacs-all-the-icons.el --- override a few icons in treemacs  -*- lexical-binding: t; -*-
 
 ;;; Code:
 

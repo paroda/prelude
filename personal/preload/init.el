@@ -1,4 +1,4 @@
-;;;; Code
+;;;; Code  -*- lexical-binding: t; -*-
 
 ;; startup speed, annoyance suppression
 (setq gc-cons-threshold 100000000)
@@ -19,6 +19,9 @@
 
 ;; disable prelude-theme
 (setq prelude-theme nil)
+
+;; disable prelude-welcome-screen
+(setq prelude-welcome-screen nil)
 
 ;; minimalistic ui, like no line numbers globally by default
 (setq prelude-minimalistic-ui t)

@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  -*- lexical-binding: t; -*-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -145,15 +145,20 @@
 
 (setq dired-listing-switches "-al --group-directories-first")
 
+(setq dired-omit-files ;; files to hide on dired-omit-mode (C-x M-o)
+      (rx (or (seq bol (? ".") "#")          ;; emacs autosave files
+              (seq bol "." (not (any ".")))  ;; dot-files
+              (seq "~" eol))))               ;; backup-files
+
 ;; dired hotkey
-(define-key dired-mode-map (kbd "r") 'dired-kill-subdir)
+;; (define-key dired-mode-map (kbd "r") 'dired-kill-subdir)
 
 (defun my-dired-show-disk-usage ()
   (interactive)
   (let* ((filename (dired-get-filename))
          (cmd (concat "du -h -d0 '" filename "'")))
     (shell-command cmd)))
-(define-key dired-mode-map (kbd "z") 'my-dired-show-disk-usage)
+;; (define-key dired-mode-map (kbd "z") 'my-dired-show-disk-usage)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;; doom theme ;;;;;;;;;;;;
@@ -471,6 +476,9 @@
 ;; cider mode enable history file
 (setq cider-repl-history-file "~/.cider-repl-history")
 (setq cider-repl-history-size 1000)
+
+;; use clojure-mode instead of edn-mode, i don't like its formatting
+(add-to-list 'auto-mode-alist '("\\.edn\\'" . clojure-mode))
 
 ;; set completion hotkey to use company
 (when (and (package-installed-p 'cider)
@@ -830,6 +838,10 @@
     (setq default-frame-alist '(;; (alpha . (90 . 75))
                                 (vertical-scroll-bars . nil)
                                 (horizontal-scroll-bars . nil)))
+
+    ;; transparency
+    (set-frame-parameter nil 'alpha-background 95)
+    (add-to-list 'default-frame-alist '(alpha-background . 95))
 
     ;; Font
     (when (member "FiraCode Nerd Font Mono" (font-family-list))
