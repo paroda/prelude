@@ -13,11 +13,13 @@ nav:
         - Programming: modules/programming.md
         - Lisp Base: modules/lisp.md
         - LSP: modules/lsp.md
+        - Eglot Booster: modules/eglot-booster.md
         - Company: modules/company.md
+        - Corfu: modules/corfu.md
+        - Apheleia (Format-on-save): modules/apheleia.md
     - Programming Languages:
         - C/C++: modules/c.md
         - Clojure: modules/clojure.md
-        - CoffeeScript: modules/coffee.md
         - Common Lisp: modules/common_lisp.md
         - CSS: modules/css.md
         - Dart: modules/dart.md
@@ -40,6 +42,7 @@ nav:
         - Scheme: modules/scheme.md
         - SCSS: modules/scss.md
         - Shell: modules/shell.md
+        - Swift: modules/swift.md
         - TypeScript: modules/ts.md
         - Web/HTML: modules/web.md
         - XML: modules/xml.md
@@ -50,10 +53,13 @@ nav:
         - Ivy: modules/ivy.md
         - Vertico: modules/vertico.md
     - Other Modules:
+        - AI Assistant: modules/ai.md
         - ERC (IRC): modules/erc.md
         - Evil (Vim): modules/evil.md
+        - Forge (PRs/Issues): modules/forge.md
         - Key Chord: modules/key_chord.md
         - Literate Programming: modules/literate-programming.md
+        - MisTTY (Terminal): modules/mistty.md
         - Org Mode: modules/orgmode.md
 - FAQ: faq.md
 - Troubleshooting: troubleshooting.md

@@ -47,7 +47,10 @@
 ;; (require 'prelude-helm) ;; Interface for narrowing and search
 ;; (require 'prelude-helm-everywhere) ;; Enable Helm everywhere
 (require 'prelude-company)
+;; (require 'prelude-corfu) ;; Lightweight modern alternative to Company (mutually exclusive with prelude-company)
+;; (require 'prelude-apheleia) ;; Async, unified format-on-save
 ;; (require 'prelude-key-chord) ;; Binds useful features to key combinations
+;; (require 'prelude-eglot-booster) ;; Speeds up Eglot via emacs-lsp-booster (requires the binary)
 
 ;;; Vim emulation
 ;;
@@ -66,7 +69,6 @@
 
 (require 'prelude-c)
 ;; (require 'prelude-clojure)
-;; (require 'prelude-coffee)
 ;; (require 'prelude-common-lisp)
 (require 'prelude-css)
 ;; (require 'prelude-dart)
@@ -92,13 +94,17 @@
 ;; (require 'prelude-scheme)
 (require 'prelude-shell)
 ;; (require 'prelude-scss)
+;; (require 'prelude-swift)
 ;; (require 'prelude-ts)
 (require 'prelude-web) ;; Emacs mode for web templates
 (require 'prelude-xml)
 (require 'prelude-yaml)
 
 ;;; Misc
+;; (require 'prelude-ai) ;; LLM-backed chat via gptel
 ;; (require 'prelude-erc) ;; A popular Emacs IRC client
+;; (require 'prelude-forge) ;; GitHub/GitLab/Gitea PRs and issues via Magit
+;; (require 'prelude-mistty) ;; MisTTY terminal (pure elisp, no native module; rebinds C-c t)
 
 (provide 'prelude-modules)
 ;;; prelude-modules.el ends here

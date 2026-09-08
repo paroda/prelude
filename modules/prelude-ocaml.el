@@ -13,8 +13,6 @@
 
 ;; You'll need to install opam and ocaml-lsp-server:
 ;;   opam install ocaml-lsp-server
-;; Optionally install utop for a better REPL experience:
-;;   opam install utop
 
 ;;; License:
 
@@ -37,20 +35,44 @@
 
 (require 'prelude-programming)
 
-(prelude-require-packages '(neocaml ocaml-eglot dune utop))
+(defun prelude-ocaml-mode-defaults ()
+  ;; CamelCase aware editing operations
+  (subword-mode +1)
+  (when (eq prelude-lsp-client 'eglot)
+    ;; ocaml-eglot-mode adds OCaml-specific LSP commands
+    ;; (switch .ml/.mli, type-enclosing, destruct, etc.)
+    (ocaml-eglot-mode 1))
+  ;; Start the LSP server (eglot-ensure or lsp-deferred)
+  (prelude-lsp-enable))
 
-(with-eval-after-load 'neocaml
-  (require 'ocaml-eglot)
+;; Tree-sitter powered major mode for OCaml, Dune, and utop.
+;; Replaces the older tuareg + merlin + utop stack.
+;; Hook into neocaml-base-mode so both .ml and .mli buffers
+;; get the same setup.
+(use-package neocaml
+  :ensure t
+  :hook (neocaml-base-mode . prelude-ocaml-mode-defaults)
+  :config
+  ;; Workaround: register neocaml modes with eglot until neocaml
+  ;; ships this fix itself (neocaml >= 20260331).  add-to-list is
+  ;; a no-op if the entry already exists.
+  (with-eval-after-load 'eglot
+    (unless (cl-some (lambda (entry)
+                       (and (consp (car entry))
+                            (assq 'neocaml-mode (car entry))))
+                     eglot-server-programs)
+      (add-to-list 'eglot-server-programs
+                   '(((neocaml-mode :language-id "ocaml")
+                      (neocaml-interface-mode
+                       :language-id "ocaml.interface"))
+                     "ocamllsp")))))
 
-  (defun prelude-ocaml-mode-defaults ()
-    (subword-mode +1)
-    (utop-minor-mode +1)
-    (ocaml-eglot-setup))
-
-  (setq prelude-ocaml-mode-hook 'prelude-ocaml-mode-defaults)
-
-  (add-hook 'neocaml-mode-hook (lambda ()
-                                 (run-hooks 'prelude-ocaml-mode-hook))))
+;; OCaml-specific Eglot extensions (requires ocaml-lsp-server).
+;; Only installed when Eglot is the configured LSP client.
+(use-package ocaml-eglot
+  :ensure t
+  :defer t
+  :if (eq prelude-lsp-client 'eglot))
 
 (provide 'prelude-ocaml)
 

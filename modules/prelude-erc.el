@@ -102,7 +102,7 @@ that can occur between two notifications.  The default is
 ;; autoaway setup
 (setq erc-auto-discard-away t)
 (setq erc-autoaway-idle-seconds 600)
-(setq erc-autoaway-use-emacs-idle t)
+(setq erc-autoaway-idle-method 'emacs)
 
 ;; utf-8 always and forever
 (setq erc-server-coding-system '(utf-8 . utf-8))

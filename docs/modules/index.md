@@ -119,7 +119,11 @@ These modules provide shared functionality used by other modules:
 - [Programming](programming.md) - common foundation for all programming modes
 - [Lisp Base](lisp.md) - common foundation for Lisp-family language modules
 - [LSP](lsp.md) - common foundation for modules using the Language Server Protocol
-- [Company](company.md) - completion framework used across many modes
+- [Eglot Booster](eglot-booster.md) - speeds up Eglot via
+  the `emacs-lsp-booster` wrapper
+- [Company](company.md) - completion framework (legacy)
+- [Corfu](corfu.md) - lightweight modern alternative to Company
+- [Apheleia](apheleia.md) - async, unified format-on-save
 
 ## Programming Language Modules
 
@@ -127,7 +131,6 @@ The following programming languages have enhanced support in Prelude:
 
 - [C/C++](c.md)
 - [Clojure](clojure.md)
-- [CoffeeScript](coffee.md)
 - [Common Lisp](common_lisp.md)
 - [CSS](css.md)
 - [Dart](dart.md)
@@ -167,8 +170,10 @@ only enable **one** of these:
 
 ## Other Modules
 
+- [AI Assistant](ai.md) - LLM-backed chat via gptel
 - [ERC](erc.md) - IRC client configuration
 - [Evil](evil.md) - Vim emulation
+- [Forge](forge.md) - GitHub/GitLab/Gitea PRs and issues via Magit
 - [Key Chord](key_chord.md) - simultaneous key press bindings
 - [Literate Programming](literate-programming.md) - org-babel
   and Jupyter notebook support
