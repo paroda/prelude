@@ -96,6 +96,8 @@
  eww-download-directory "~/Downloads/"
  whitespace-line-column 100)
 
+(tool-bar-mode -1)
+
 (setq-default
  tab-width 4
  help-window-select t         ;; Focus new help window when opened
@@ -139,6 +141,11 @@
 
 ;; enable auto root mode open
 (crux-reopen-as-root-mode)
+
+(keymap-unset smartparens-mode-map "M-<backspace>")
+(global-unset-key (kbd "M-s"))
+(global-set-key (kbd "M-s") 'sp-splice-sexp)
+(global-set-key (kbd "M-S") 'sp-split-sexp)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; dired - sort by grouping directories first
