@@ -29,6 +29,7 @@
     consult
     consult-flycheck
     orderless
+    ;; company-posframe
     ;; company-box
     ibuffer-projectile
     marginalia
@@ -220,7 +221,7 @@
   "Use a pretty lambda symbol"
   (setq prettify-symbols-alist '(("lambda" . ?𝛌))))
 (dolist (m '(lisp-mode-hook emacs-lisp-mode-hook))
-  (add-hook m 'add-pretty-lambda))
+  (add-hook m #'add-pretty-lambda))
 
 (defun add-pretty-org ()
   "Make some word or string show as pretty Unicode symbols. See https://unicodelookup.com for more."
@@ -241,7 +242,7 @@
           ("#+begin_quote" . (?𝒬 (Br . Bl) ?⇒))   ;; 𝒬⇒
           ("#+END_QUOTE"    . ?⇐)
           ("#+end_quote"    . ?⇐))))
-(add-hook 'org-mode-hook 'add-pretty-org)
+(add-hook 'org-mode-hook #'add-pretty-org)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -322,22 +323,51 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; company
 (require 'prelude-company)
-;; (require 'company-box)
 
-(when (package-installed-p 'company-box)
+;; company general configuration
+(when (package-installed-p 'company)
+  ;; Use standard overlay frontends (100% reliable on Wayland)
+  (setq company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+                            company-echo-metadata-frontend))
   (global-set-key (kbd "M-TAB") #'company-complete)
-  (add-hook 'company-mode-hook 'company-box-mode)
-  (setf (alist-get 'left-fringe company-box-frame-parameters) 10)
-  (setf (alist-get 'right-fringe company-box-frame-parameters) 10))
+  (add-hook 'text-mode-hook (lambda () (company-mode -1)))
+  ;; Style the native tooltip overlay
+  (set-face-attribute 'company-tooltip nil :background "#283644" :foreground "#ffffff")
+  (set-face-attribute 'company-tooltip-selection nil :background "#334455")
+  (set-face-attribute 'company-tooltip-common nil :foreground "#46d9ff"))
 
-;; popups
 (set-face-attribute 'tooltip nil :background "#334455")
-(when (package-installed-p 'company)
-  (set-face-attribute 'company-tooltip nil :background "#283644"))
 
-;; disable in text-mode
-(when (package-installed-p 'company)
-  (add-hook 'text-mode-hook (lambda () (company-mode -1))))
+;; (when (package-installed-p 'company-posframe)
+;;   (require 'company-posframe)
+;;   (company-posframe-mode 1)
+;;   (with-eval-after-load 'company-posframe
+;;     ;; Ensure child frame parameter settings force full opacity
+;;     (setq company-posframe-parameters
+;;           '((left-fringe . 10)
+;;             (right-fringe . 10)
+;;             (alpha . 100)
+;;             (alpha-background . 100)
+;;             ;; Force explicit dark background color parameter
+;;             (background-color . "#283644")))
+;;     (set-face-attribute 'company-tooltip nil :background "#283644")
+;;     (set-face-attribute 'company-tooltip-selection nil :background "#334455")
+;;     (set-face-attribute 'company-posframe-active-backend-name nil :background "#283644")))
+
+;; (when (package-installed-p 'company-box)
+;;   (require 'company-box)
+;;   (add-hook 'company-mode-hook #'company-box-mode)
+;;   (with-eval-after-load 'company-box
+;;     ;; Ensure company-box replaces default company frontends
+;;     (setq company-frontends '(company-box-frontend))
+;;     ;; Ensure child frames have proper left/right padding and full opacity
+;;     (setq company-box-frame-parameters
+;;           '((left-fringe . 10)
+;;             (right-fringe . 10)
+;;             (alpha . 100)
+;;             (alpha-background . 100)))
+;;     ;; Background color for company-box
+;;     (set-face-attribute 'company-box-background nil :background "#283644")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; enable ibuffer grouping as vcs
@@ -390,7 +420,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; enable git flow
 ;; (require 'magit-gitflow)
-;; (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
+;; (add-hook 'magit-mode-hook #'turn-on-magit-gitflow)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Syntax highlighting
@@ -406,7 +436,7 @@
   (define-key hs-minor-mode-map (kbd "C-t") 'hs-toggle-hiding)
   (define-key hs-minor-mode-map (kbd "C-S-t") 'hs-hide-all)
   (define-key hs-minor-mode-map (kbd "C-S-a") 'hs-show-all))
-(add-hook 'prog-mode-hook 'hs-minor-mode)
+(add-hook 'prog-mode-hook #'hs-minor-mode)
 
 ;; configure comment tool
 (defun toggle-comment-on-line ()
@@ -468,8 +498,8 @@
 ;;       rtags-path "~/.dipu/rtags/src/rtags.el"
 ;;       rtags-rc-binary-name "~/.dipu/rtags/bin/rc"
 ;;       rtags-rdm-binary-name "~/.dipu/rtags/bin/rdm")
-;; (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
-;; (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+;; (add-hook 'c-mode-hook #'rtags-start-process-unless-running)
+;; (add-hook 'c++-mode-hook #'rtags-start-process-unless-running)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -518,7 +548,7 @@
   "Use a pretty lambda symbol"
   (setq prettify-symbols-alist '(("fn" . ?𝛌))))
 (dolist (m '(clojure-mode-hook clojurescript-mode-hook cider-repl-mode-hook))
-  (add-hook m 'add-pretty-clojure))
+  (add-hook m #'add-pretty-clojure))
 
 ;; hide all block on load
 ;; (add-hook 'clojure-mode-hook #'hs-hide-all)
@@ -656,8 +686,8 @@
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ;; pandoc
 ;; (require 'pandoc-mode)
-;; (add-hook 'markdown-mode-hook 'pandoc-mode)
-;; (add-hook 'pandoc-mode-hook 'pandoc-load-default-settings)
+;; (add-hook 'markdown-mode-hook #'pandoc-mode)
+;; (add-hook 'pandoc-mode-hook #'pandoc-load-default-settings)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TRAMP
